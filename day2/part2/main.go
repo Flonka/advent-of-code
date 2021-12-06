@@ -11,15 +11,18 @@ func main() {
 
 	lines := input.ReadLinesInFile("input")
 
-	sum := [2]int{0, 0}
+	aim := 0
+	depth := 0
+	horizontal := 0
 
 	for _, commandString := range lines {
 		c := day2.NewCommandFromInputLine(commandString)
 
-		sum[0] += c.Direction[0]
-		sum[1] += c.Direction[1]
+		horizontal += c.Direction[0]
+		depth += aim * c.Direction[0]
+		aim += c.Direction[1]
 	}
 
-	fmt.Println(sum[0] * sum[1])
+	fmt.Println(horizontal * depth)
 
 }
