@@ -45,4 +45,13 @@ func TestBitmaskCriteria(t *testing.T) {
 	if result != one {
 		t.Fatalf("%012b is not equal to %012b", result, one)
 	}
+	one = 1 << 3
+	result = bitmaskCriteria(d, 3, false)
+	if result != one {
+		t.Fatalf("%012b is not equal to %012b", result, one)
+	}
+	result = bitmaskCriteria(d, 3, true)
+	if result != zero {
+		t.Fatalf("%012b is not equal to %012b", result, zero)
+	}
 }

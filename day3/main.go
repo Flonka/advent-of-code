@@ -76,25 +76,12 @@ func powerConsumption() []int {
 }
 
 func findByCriteria(data []int, most bool) int {
-	// fmt.Println(bits)
-	// fmt.Printf("%0"+fmt.Sprint(bits)+"b\n", criteria)
-	// fmt.Printf("%012b\n", 1<<0)
-	// fmt.Printf("%012b\n", criteria&(1<<0))
-	// fmt.Printf("%v\n", criteria&(1<<0))
-
 	var out []int
 	out = data
 	bits := 12
 	for i := bits - 1; i >= 0; i-- {
-		if len(out) < 10 {
-			fmt.Println("---")
-			for _, v := range out {
-				fmt.Printf("%012b\n", v)
-			}
-			fmt.Println("---")
-		}
+
 		out = filterInts(out, i, most)
-		fmt.Println("After filter", len(out))
 
 		if len(out) == 1 {
 			return out[0]
@@ -109,23 +96,30 @@ func findByCriteria(data []int, most bool) int {
 func bitmaskCriteria(data []int, pos int, mostCommon bool) int {
 
 	// Find count of set bit by position
-	var setBitCount int
+	var setBits int
 	mask := 1 << pos
 	for _, v := range data {
 		x := v & mask
-		// fmt.Printf("%012b value\n", v)
-		// fmt.Printf("%012b mask\n", mask)
-		// fmt.Printf("%012b x %v\n", x, x)
 		x = x >> pos
-		setBitCount += x
+		setBits += x
 	}
 	// Create criteria int , 1 or 0 depending on most common.
-	var criteria int
-	half := len(data) / 2
+	unsetBits := len(data) - setBits
 
-	if setBitCount == len(data) {
-		criteria = 1
-	} else if setBitCount >= half && mostCommon {
+	if setBits == len(data) {
+		return 1 << pos
+	}
+
+	if setBits == 0 {
+		return 0
+	}
+
+	var criteria int
+	if mostCommon {
+		if setBits >= unsetBits {
+			criteria = 1
+		}
+	} else if setBits < unsetBits {
 		criteria = 1
 	}
 
@@ -133,7 +127,6 @@ func bitmaskCriteria(data []int, pos int, mostCommon bool) int {
 }
 
 func filterInts(data []int, pos int, mostCommon bool) []int {
-	// fmt.Println("filter", pos)
 	mask := 1 << pos
 	criteria := bitmaskCriteria(data, pos, mostCommon)
 	var filtered []int = make([]int, 0)
@@ -141,31 +134,8 @@ func filterInts(data []int, pos int, mostCommon bool) []int {
 		maskedV := v & mask
 		if maskedV == criteria {
 			filtered = append(filtered, v)
-			if len(data) < 10 {
-				fmt.Printf("%012b v \n", v)
-				fmt.Printf("%012b mask\n", mask)
-				fmt.Printf("%012b masked V \n", maskedV)
-				fmt.Printf("%012b criteria \n", criteria)
-				fmt.Printf("%012b added\n", v)
-			}
-		} else {
-			if len(data) < 10 {
-				fmt.Printf("%012b v \n", v)
-				fmt.Printf("%012b mask\n", mask)
-				fmt.Printf("%012b masked V \n", maskedV)
-				fmt.Printf("%012b criteria \n", criteria)
-				fmt.Printf("%012b removed\n", v)
-			}
-			// fmt.Printf("%012b masked C \n", maskedCrit)
-			// fmt.Printf("%012b result %v\n", comp, maskedCrit == maskedV)
 		}
-
 	}
 
 	return filtered
-}
-
-func hasBit(n int, pos uint) bool {
-	val := n & (1 << pos)
-	return (val > 0)
 }
