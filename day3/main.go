@@ -10,6 +10,14 @@ import (
 
 func main() {
 
+	allInts := powerConsumption()
+
+	oxygenGeneratorRating := findByCriteria(allInts, true)
+	c02ScrubberRating := findByCriteria(allInts, false)
+	fmt.Println("Life Support Rating:", oxygenGeneratorRating*c02ScrubberRating)
+}
+
+func powerConsumption() []int {
 	lines := input.ReadLinesInFile("input")
 
 	allInts := make([]int, 0, len(lines))
@@ -18,11 +26,11 @@ func main() {
 
 	for _, binaryString := range lines {
 
-		lineInt, err := strconv.Atoi(binaryString)
+		lineInt, err := strconv.ParseInt(binaryString, 2, 16)
 		if err != nil {
 			log.Fatal(err)
 		}
-		allInts = append(allInts, lineInt)
+		allInts = append(allInts, int(lineInt))
 
 		for i := 0; i < len(bitCount); i++ {
 
@@ -38,7 +46,7 @@ func main() {
 	halfAmount := len(lines) / 2
 	var gammaRateBinString string
 	for i := 0; i < len(bitCount); i++ {
-		if bitCount[i] > halfAmount {
+		if bitCount[i] >= halfAmount {
 			gammaRateBinString += "1"
 		} else {
 			gammaRateBinString += "0"
@@ -55,46 +63,106 @@ func main() {
 	// epsilon rate should be bitwise inverse of gammrate
 	epsilonRate := ones ^ int(gammaRate)
 
-	fmt.Printf("%v\n", gammaRate)
-	fmt.Printf("%012b\n", gammaRate)
+	// fmt.Printf("%v\n", gammaRate)
+	// fmt.Printf("%012b\n", gammaRate)
 
-	fmt.Printf("%v\n", epsilonRate)
-	fmt.Printf("%012b\n", epsilonRate)
+	// fmt.Printf("%v\n", epsilonRate)
+	// fmt.Printf("%012b\n", epsilonRate)
 
 	fmt.Println("Power Consumption:", gammaRate*int64(epsilonRate))
 
-	findByCriteria(allInts, int(gammaRate), len(bitCount))
-	// oxygenGeneratorRating := findByCriteria(allInts, int(gammaRate))
-	// c02ScrubberRating := findByCriteria(allInts, epsilonRate)
-	// fmt.Println("Life Support Rating:", oxygenGeneratorRating*c02ScrubberRating)
+	return allInts
+
 }
 
-func findByCriteria(data []int, criteria int, bits int) int {
-	fmt.Println(bits)
-	fmt.Printf("%0"+fmt.Sprint(bits)+"b\n", criteria)
-	fmt.Printf("%012b\n", 1<<0)
-	fmt.Printf("%012b\n", criteria&(1<<0))
-	fmt.Printf("%v\n", criteria&(1<<0))
+func findByCriteria(data []int, most bool) int {
+	// fmt.Println(bits)
+	// fmt.Printf("%0"+fmt.Sprint(bits)+"b\n", criteria)
+	// fmt.Printf("%012b\n", 1<<0)
+	// fmt.Printf("%012b\n", criteria&(1<<0))
+	// fmt.Printf("%v\n", criteria&(1<<0))
 
-	out := make([]int, 0, len(data))
+	var out []int
 	out = data
+	bits := 12
 	for i := bits - 1; i >= 0; i-- {
-		out = filterInts(out, criteria, i)
+		if len(out) < 10 {
+			fmt.Println("---")
+			for _, v := range out {
+				fmt.Printf("%012b\n", v)
+			}
+			fmt.Println("---")
+		}
+		out = filterInts(out, i, most)
+		fmt.Println("After filter", len(out))
+
 		if len(out) == 1 {
 			return out[0]
 		}
 	}
 
-	// log.Fatal(out)
-	return 0
+	log.Fatal(out)
+	return out[0]
 }
 
-func filterInts(data []int, criteria int, pos int) []int {
+// Return bitcriteria to use in filtering out values
+func bitmaskCriteria(data []int, pos int, mostCommon bool) int {
+
+	// Find count of set bit by position
+	var setBitCount int
+	mask := 1 << pos
 	for _, v := range data {
-		fmt.Println(v)
+		x := v & mask
+		// fmt.Printf("%012b value\n", v)
+		// fmt.Printf("%012b mask\n", mask)
+		// fmt.Printf("%012b x %v\n", x, x)
+		x = x >> pos
+		setBitCount += x
+	}
+	// Create criteria int , 1 or 0 depending on most common.
+	var criteria int
+	half := len(data) / 2
+
+	if setBitCount == len(data) {
+		criteria = 1
+	} else if setBitCount >= half && mostCommon {
+		criteria = 1
 	}
 
-	return data
+	return criteria << pos
+}
+
+func filterInts(data []int, pos int, mostCommon bool) []int {
+	// fmt.Println("filter", pos)
+	mask := 1 << pos
+	criteria := bitmaskCriteria(data, pos, mostCommon)
+	var filtered []int = make([]int, 0)
+	for _, v := range data {
+		maskedV := v & mask
+		if maskedV == criteria {
+			filtered = append(filtered, v)
+			if len(data) < 10 {
+				fmt.Printf("%012b v \n", v)
+				fmt.Printf("%012b mask\n", mask)
+				fmt.Printf("%012b masked V \n", maskedV)
+				fmt.Printf("%012b criteria \n", criteria)
+				fmt.Printf("%012b added\n", v)
+			}
+		} else {
+			if len(data) < 10 {
+				fmt.Printf("%012b v \n", v)
+				fmt.Printf("%012b mask\n", mask)
+				fmt.Printf("%012b masked V \n", maskedV)
+				fmt.Printf("%012b criteria \n", criteria)
+				fmt.Printf("%012b removed\n", v)
+			}
+			// fmt.Printf("%012b masked C \n", maskedCrit)
+			// fmt.Printf("%012b result %v\n", comp, maskedCrit == maskedV)
+		}
+
+	}
+
+	return filtered
 }
 
 func hasBit(n int, pos uint) bool {
