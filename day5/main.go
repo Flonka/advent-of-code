@@ -17,11 +17,14 @@ func main() {
 	for i := range lines {
 		line := lines[i]
 
+		var points []Pos
 		if (line.start.x == line.end.x) || line.start.y == line.end.y {
-			points := line.Points()
-			for j := range points {
-				result[points[j]]++
-			}
+			points = line.StraightPoints()
+		} else {
+			points = line.DiagonalPoints()
+		}
+		for j := range points {
+			result[points[j]]++
 		}
 
 	}
@@ -41,7 +44,29 @@ type Line struct {
 	end   Pos
 }
 
-func (l *Line) Points() []Pos {
+func (l *Line) DiagonalPoints() []Pos {
+
+	var p []Pos
+
+	xdiff := l.end.x - l.start.x
+	ydiff := l.end.y - l.start.y
+
+	xmult := 1
+	if xdiff < 0 {
+		xmult = -1
+	}
+	ymult := 1
+	if ydiff < 0 {
+		ymult = -1
+	}
+	for i := 0; i <= xmult*xdiff; i++ {
+		p = append(p, Pos{x: l.start.x + xmult*i, y: l.start.y + ymult*i})
+	}
+
+	return p
+}
+
+func (l *Line) StraightPoints() []Pos {
 
 	var p []Pos
 	xdiff := l.end.x - l.start.x
