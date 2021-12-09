@@ -2,18 +2,24 @@ package input
 
 import (
 	"bufio"
+	"io"
 	"log"
 	"os"
 )
 
-func ReadLinesInFile(fileName string) []string {
+func OpenFile(fileName string) io.ReadCloser {
 	f, err := os.Open(fileName)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	s := bufio.NewScanner(f)
+	return f
+}
 
+func ReadLinesInFile(fileName string) []string {
+	f := OpenFile(fileName)
+	defer f.Close()
+	s := bufio.NewScanner(f)
 	outputLines := make([]string, 0, 200)
 	for s.Scan() {
 		outputLines = append(outputLines, s.Text())
