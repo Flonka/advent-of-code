@@ -12,15 +12,43 @@ import (
 
 func main() {
 
-	fishes := readFishes()
+	fish := readFish()
 
+	days := 256
+
+	for day := 0; day < days; day++ {
+		babyFish := 0
+		for i := 0; i < len(fish); i++ {
+			f := &fish[i]
+			if f.PassOneDay() {
+				babyFish++
+			}
+		}
+
+		// spawn new fish
+		for b := 0; b < babyFish; b++ {
+			fish = append(fish, Fish{timer: 8})
+		}
+	}
+
+	fmt.Printf("Fish after %v days %v\n", days, len(fish))
 }
 
 type Fish struct {
 	timer int
 }
 
-func readFishes() []Fish {
+// PassOneDay passes the fish one day returns true if it spawned a new fish
+func (f *Fish) PassOneDay() bool {
+	f.timer--
+	if f.timer < 0 {
+		f.timer = 6
+		return true
+	}
+	return false
+}
+
+func readFish() []Fish {
 	r := input.OpenFile("input")
 	defer r.Close()
 
