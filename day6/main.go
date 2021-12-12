@@ -13,25 +13,43 @@ import (
 func main() {
 
 	fish := readFish()
+	timerMap := createTimerMap(fish)
 
 	days := 256
 
 	for day := 0; day < days; day++ {
-		babyFish := 0
-		for i := 0; i < len(fish); i++ {
-			f := &fish[i]
-			if f.PassOneDay() {
-				babyFish++
-			}
+
+		// forward timer one day
+		for t := 1; t <= 9; t++ {
+			timerMap[t-1] = timerMap[t]
 		}
 
-		// spawn new fish
-		for b := 0; b < babyFish; b++ {
-			fish = append(fish, Fish{timer: 8})
-		}
+		// Spawn the new baby fish and reset timer on fish
+		babies := timerMap[0]
+		timerMap[9] = babies
+		timerMap[7] += babies
+		timerMap[0] = 0
+
 	}
 
-	fmt.Printf("Fish after %v days %v\n", days, len(fish))
+	var fishCount int
+	fmt.Println(timerMap)
+	for _, n := range timerMap {
+		fishCount += n
+	}
+	fmt.Printf("Fishes after %v days: %v", days, fishCount)
+}
+
+func createTimerMap(f []Fish) [10]int {
+
+	m := [10]int{}
+
+	for i := range f {
+		fish := &f[i]
+		m[fish.timer+1]++
+	}
+
+	return m
 }
 
 type Fish struct {
