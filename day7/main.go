@@ -41,7 +41,9 @@ func calculateConsumption(pos int, data []int) int {
 		if diff < 0 {
 			diff = -diff
 		}
-		c += diff
+
+		posConsumption := (diff * (diff + 1)) / 2
+		c += posConsumption
 	}
 
 	return c
