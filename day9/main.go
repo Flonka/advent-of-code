@@ -14,6 +14,15 @@ type heightmap struct {
 	data [][]int
 }
 
+func (h *heightmap) calculateRisk(lowPoints []pos) int {
+	var risk int
+	for _, p := range lowPoints {
+		// The risk level of a low point is 1 plus its height.
+		risk += h.data[p.y][p.x] + 1
+	}
+
+	return risk
+}
 
 func (h *heightmap) trim() {
 	for i, row := range h.data {
@@ -39,9 +48,10 @@ func (h *heightmap) findLowPositions() []pos {
 
 			// is the current value low
 			lowVal := true
+
 			for _, n := range neighbours {
 				neighbourValue := h.data[n.y][n.x]
-				if neighbourValue < val {
+				if neighbourValue <= val {
 					lowVal = false
 					break
 				}
@@ -84,7 +94,7 @@ func getNeighbouringPositions(x int, y int, yMax int, xMax int) []pos {
 func InitHeightmap(length int) heightmap {
 
 	d := make([][]int, length)
-	for i, _ := range d {
+	for i := range d {
 		d[i] = make([]int, 0, length)
 	}
 
@@ -95,14 +105,13 @@ func InitHeightmap(length int) heightmap {
 
 func main() {
 
-	hmap := readData("input_example")
-	fmt.Println(hmap)
+	hmap := readData("input")
 
 	lows := hmap.findLowPositions()
-	fmt.Println(lows)
+	// fmt.Println(lows)
 
-
-
+	risk := hmap.calculateRisk(lows)
+	fmt.Println("Risk:", risk)
 }
 
 func readData(p string) heightmap {
