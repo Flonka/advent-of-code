@@ -11,7 +11,7 @@ import (
 
 func main() {
 
-	r := input.OpenFile("ex_input")
+	r := input.OpenFile("input")
 	defer r.Close()
 	s := bufio.NewScanner(r)
 
@@ -26,17 +26,21 @@ func main() {
 
 		fmt.Println(signalPatterns)
 
-		// for i := 0; i < 10; i++ {
-
-		// }
-
-		outputDigits := strings.Fields(d[1])
-		for i := 0; i < 4; i++ {
-			switch len(outputDigits[i]) {
+		inputDigits := strings.Fields(d[0])
+		for i := 0; i < 10; i++ {
+			switch len(inputDigits[i]) {
 			case 2, 3, 4, 7:
 				easyDigitCount++
 			}
 		}
+
+		// outputDigits := strings.Fields(d[1])
+		// for i := 0; i < 4; i++ {
+		// 	switch len(outputDigits[i]) {
+		// 	case 2, 3, 4, 7:
+		// 		easyDigitCount++
+		// 	}
+		// }
 	}
 
 	fmt.Println("Part1:", easyDigitCount)
