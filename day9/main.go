@@ -38,6 +38,10 @@ type pos struct {
 	y int
 }
 
+type basin struct {
+	positions []pos
+}
+
 func (h *heightmap) findLowPositions() []pos {
 	lowPositions := make([]pos, 0, 20)
 
@@ -105,13 +109,59 @@ func InitHeightmap(length int) heightmap {
 
 func main() {
 
-	hmap := readData("input")
+	hmap := readData("input_example")
 
 	lows := hmap.findLowPositions()
 	// fmt.Println(lows)
 
 	risk := hmap.calculateRisk(lows)
 	fmt.Println("Risk:", risk)
+
+	basins := findBasins(hmap, lows)
+	fmt.Println(basins)
+
+}
+
+func findBasins(hmap heightmap, lowPositions []pos) []basin {
+
+	basins := make([]basin, 0, 10)
+
+	// Basin
+	// per low pos , djikstra utåt ? , spara basin och dess pos ( applicera basin-regler), spara LUT för positioner använda i basin
+	// reducera alla basin mha LUT.
+
+	// 	A basin is all locations that eventually flow downward to a single low point. Therefore, every low point has a basin, although some basins are very small. Locations of height 9 do not count as being in any basin, and all other locations will always be part of exactly one basin.
+
+	// The size of a basin is the number of locations within the basin, including the low point. The example above has four basins.§
+
+	// inBasin := make(map[pos]bool)
+	for _, lowPos := range lowPositions {
+		hmap.fillBasin(lowPos)
+	}
+
+	return basins
+
+}
+
+// Return positions forming a basin
+func (h *heightmap) fillBasin(p pos) []pos {
+
+	basinPositions := make([]pos, 0, 10)
+	queue := getNeighbouringPositions(p.x, p.y, len(h.data), len(h.data[0]))
+
+
+	for len(queue) > 0 {
+		n = queue[0]
+		queue = queue[1:]
+
+		// Check if n is valid 
+		// if so, write to basinPosition
+		// add neighbours of n to queue
+
+
+	}
+
+	return basinPositions
 }
 
 func readData(p string) heightmap {
