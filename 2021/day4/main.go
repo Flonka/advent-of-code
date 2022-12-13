@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Flonka/advent-of-code-2021/input"
+	"github.com/Flonka/advent-of-code/input"
 )
 
 type BingoBoard struct {

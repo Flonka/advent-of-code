@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/Flonka/advent-of-code-2021/day1"
+	"github.com/Flonka/advent-of-code/2021/day1"
 )
 
 func main() {

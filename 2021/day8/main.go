@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/Flonka/advent-of-code-2021/input"
+	"github.com/Flonka/advent-of-code/input"
 )
 
 func main() {

@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/Flonka/advent-of-code-2021/day2"
-	"github.com/Flonka/advent-of-code-2021/input"
+	"github.com/Flonka/advent-of-code/2021/day2"
+	"github.com/Flonka/advent-of-code/input"
 )
 
 func main() {

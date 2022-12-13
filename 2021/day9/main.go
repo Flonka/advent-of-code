@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Flonka/advent-of-code-2021/input"
+	"github.com/Flonka/advent-of-code/input"
 )
 
 type heightmap struct {
@@ -149,15 +149,13 @@ func (h *heightmap) fillBasin(p pos) []pos {
 	basinPositions := make([]pos, 0, 10)
 	queue := getNeighbouringPositions(p.x, p.y, len(h.data), len(h.data[0]))
 
-
 	for len(queue) > 0 {
-		n = queue[0]
+		// n = queue[0]
 		queue = queue[1:]
 
-		// Check if n is valid 
+		// Check if n is valid
 		// if so, write to basinPosition
 		// add neighbours of n to queue
-
 
 	}
 
