@@ -15,13 +15,36 @@ func main() {
 
 	s := bufio.NewScanner(r)
 	var points int
+	var points2 int
 	for s.Scan() {
 		line := s.Text()
 		round := strings.Split(line, " ")
 		points += playRound(round[0], round[1])
+
+		var move string
+		switch round[1] {
+		case "X":
+			// lose
+			move = loseLUT[round[0]]
+		case "Y":
+			// draw
+			switch round[0] {
+			case "A":
+				move = "X"
+			case "B":
+				move = "Y"
+			case "C":
+				move = "Z"
+			}
+		case "Z":
+			// win
+			move = winLUT[round[0]]
+		}
+		points2 += playRound(round[0], move)
 	}
 
-	fmt.Println("TotalPoints:", points)
+	fmt.Println("Part1:", points)
+	fmt.Println("Part2:", points2)
 }
 
 // your move ponint
