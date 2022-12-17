@@ -18,6 +18,15 @@ func OpenFile(fileName string) io.ReadCloser {
 	return f
 }
 
+func OpenFileBuffered(fileName string) *bufio.Scanner {
+	f, err := os.Open(fileName)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	return bufio.NewScanner(f)
+}
+
 func ReadLinesInFile(fileName string) []string {
 	f := OpenFile(fileName)
 	defer f.Close()

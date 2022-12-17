@@ -14,6 +14,7 @@ func main() {
 	defer r.Close()
 
 	s := bufio.NewScanner(r)
+	
 	var points int
 	var points2 int
 	for s.Scan() {
