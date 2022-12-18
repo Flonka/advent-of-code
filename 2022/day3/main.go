@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"strings"
 	"unicode"
 
@@ -13,29 +14,57 @@ func main() {
 	s := input.OpenFileBuffered("input")
 
 	var sum int
+	var groupSum int
+	var lines []string
+	var groupPrios map[int]int = make(map[int]int)
 	for s.Scan() {
 		line := s.Text()
 		l := len(line)
 		c1 := line[:(l / 2)]
 		c2 := line[(l / 2):]
-
 		ps := getCommonPriorities(c1, c2)
-
-		fmt.Println(ps)
+		// Task 1
 		for k := range ps {
-			sum += k	
+			sum += k
+		}
+
+		// Task 2
+		lines = append(lines, line)
+
+		if len(lines) == 3 {
+			// Every third line, find groupPrio result + reset
+
+			for k := range(getCommonPriorities(lines[0], lines[1])) {
+				groupPrios[k]++
+			}
+			for k := range(getCommonPriorities(lines[0], lines[2])) {
+				groupPrios[k]++
+			}
+
+			found := false
+			for k, v := range groupPrios {
+				if v == 2 {
+					groupSum += k
+					found = true
+				} 
+			}
+
+			if !found {
+				log.Fatal("didnt find it", groupPrios)
+			}
+
+			groupPrios = make(map[int]int)
+			lines = make([]string, 0, 10)
 		}
 	}
 
-
 	fmt.Println("task1", sum)
+	fmt.Println("task2", groupSum)
 
 }
 
 func getCommonPriorities(c1 string, c2 string) map[int]int {
 
-	fmt.Println("c1", c1)
-	fmt.Println("c2", c2)
 	var prios map[int]int = make(map[int]int)
 	for _, v := range c1 {
 
