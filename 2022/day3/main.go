@@ -12,7 +12,7 @@ func main() {
 
 	s := input.OpenFileBuffered("input")
 
-	var prioMap map[int]bool = make(map[int]bool)
+	var sum int
 	for s.Scan() {
 		line := s.Text()
 		l := len(line)
@@ -21,33 +21,28 @@ func main() {
 
 		ps := getCommonPriorities(c1, c2)
 
-		for _, i := range ps {
-			prioMap[i] = true
+		fmt.Println(ps)
+		for k := range ps {
+			sum += k	
 		}
 	}
 
-	fmt.Println(prioMap)
-
-	var sum int
-	for k := range prioMap {
-		sum += k
-	}
 
 	fmt.Println("task1", sum)
 
 }
 
-func getCommonPriorities(c1 string, c2 string) []int {
+func getCommonPriorities(c1 string, c2 string) map[int]int {
 
 	fmt.Println("c1", c1)
 	fmt.Println("c2", c2)
-	var prios []int
+	var prios map[int]int = make(map[int]int)
 	for _, v := range c1 {
 
 		if strings.ContainsRune(c2, v) {
 
 			prio := runeToPrio(v)
-			prios = append(prios, prio)
+			prios[prio]++
 		}
 
 	}
