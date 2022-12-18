@@ -26,6 +26,8 @@ func main() {
 		}
 	}
 
+	fmt.Println(prioMap)
+
 	var sum int
 	for k := range prioMap {
 		sum += k
@@ -37,25 +39,14 @@ func main() {
 
 func getCommonPriorities(c1 string, c2 string) []int {
 
-	// fmt.Println("c1", c1)
-	// fmt.Println("c2", c2)
+	fmt.Println("c1", c1)
+	fmt.Println("c2", c2)
 	var prios []int
 	for _, v := range c1 {
 
 		if strings.ContainsRune(c2, v) {
 
-			var priodiff int
-			if unicode.IsUpper(v) {
-				// 65 -27 =
-				priodiff = 38
-			} else {
-				// 97 - 1
-				priodiff = 96
-			}
-
-			// fmt.Println(string(v))
-			prio := int(v) - priodiff
-			// fmt.Println(prio)
+			prio := runeToPrio(v)
 			prios = append(prios, prio)
 		}
 
@@ -63,4 +54,19 @@ func getCommonPriorities(c1 string, c2 string) []int {
 
 	return prios
 
+}
+
+func runeToPrio(r rune) int {
+
+	var priodiff int
+	if unicode.IsUpper(r) {
+		// 65 -27 =
+		priodiff = 38
+	} else {
+		// 97 - 1
+		priodiff = 96
+	}
+
+	prio := int(r) - priodiff
+	return prio
 }
