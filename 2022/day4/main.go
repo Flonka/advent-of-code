@@ -2,11 +2,20 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"math"
 	"strconv"
 	"strings"
 
 	"github.com/Flonka/advent-of-code/input"
 )
+
+type assignmentMask = []uint
+
+type assignmentRange struct {
+	start uint
+	end   uint
+}
 
 func main() {
 	s := input.OpenFileBuffered("input")
@@ -17,8 +26,17 @@ func main() {
 		// Get pairs
 		pairs := strings.Split(line, ",")
 
+		// Find out how many assignment masks are needed
+		// based on max range and intsize of architecture
+		prange := make([]assignmentRange, len(pairs))
+		for i, v := range pairs {
+			s, e := getBounds(v)
+			prange[i].start = s
+			prange[i].end = e
+		}
+
 		// Create bitmasks representing pairs
-		masks := createMasks(pairs)
+		masks := createMasks(prange)
 
 		// Check if they are fully cointained with eachother
 		// and increment counter
@@ -35,8 +53,9 @@ func main() {
 	fmt.Println("Part1:", fullyCointained)
 }
 
-func printMasks(masks []uint) {
-	fmt.Printf("%0100b\n%0100b\n", masks[0], masks[1])
+func printMasks(masks []assignmentMask) {
+	// TODO: Print Intsize
+	fmt.Printf("%064b\n%064b\n", masks[0], masks[1])
 
 	// fmt.Printf("AND \t %010b\n", masks[0]&masks[1])
 	// fmt.Printf("OR \t %010b\n", masks[0]|masks[1])
@@ -46,23 +65,53 @@ func printMasks(masks []uint) {
 	// fmt.Printf("ANDNOT \t%010b\n", masks[0]&^masks[1])
 }
 
-func createMasks(pairs []string) []uint {
+// createMasks creates assignmentMask slice from given assignmentRange slice
+func createMasks(pairs []assignmentRange) []assignmentMask {
 
-	masks := make([]uint, len(pairs))
+	var maxBound uint
+	for _, v := range pairs {
+		if v.end > maxBound {
+			maxBound = v.end
+		}
+	}
+
+	// Calcualte needed mask slices
+	fmt.Println("maxbound", maxBound)
+	d := float64(maxBound) / strconv.IntSize
+	fmt.Println("d", d)
+	m := uint(math.Ceil(d))
+	fmt.Println("found m", m)
+
+	// equal number of masks needed as pairs
+	masks := make([]assignmentMask, len(pairs))
 
 	for maskI, v := range pairs {
-		spans := strings.Split(v, "-")
-		start, _ := strconv.Atoi(spans[0])
-		end, _ := strconv.Atoi(spans[1])
 
-		for i := start; i <= end; i++ {
-			masks[maskI] = setBit(masks[maskI], uint(i-1))
+		masks[maskI] = make(assignmentMask, 2)
+
+		for i := v.start; i <= v.end; i++ {
+			vv := masks[maskI][0]
+			masks[maskI][0] = setBit(vv, i-1)
 		}
 
 	}
 
 	return masks
 
+}
+
+// Return start and end of a pair span e.g. 3-7
+func getBounds(s string) (uint, uint) {
+	spans := strings.Split(s, "-")
+	start, err := strconv.Atoi(spans[0])
+	if err != nil {
+		log.Fatal(err)
+	}
+	end, err := strconv.Atoi(spans[1])
+	if err != nil {
+		log.Fatal(err)
+	}
+	return uint(start), uint(end)
 }
 
 // Sets the bit at pos in the integer n.
@@ -73,10 +122,10 @@ func setBit(n uint, pos uint) uint {
 
 // Returns whether any assignment is contained in
 // any of the other assignments
-func isContained(assignments []uint) bool {
-	for i, a := range assignments {
+func isContained(assignments []assignmentMask) bool {
+	for i, a := range assignments[0] {
 
-		for j, b := range assignments {
+		for j, b := range assignments[0] {
 			if j == i {
 				continue
 			}
