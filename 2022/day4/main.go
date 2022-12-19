@@ -40,14 +40,15 @@ func main() {
 
 		// Check if they are fully cointained with eachother
 		// and increment counter
+		fmt.Println(pairs)
+		printMasks(masks)
 		if isContained(masks) {
-			fmt.Println(pairs)
-			printMasks(masks)
 			fmt.Println("Contained")
 			fullyCointained++
-			fmt.Println()
+		} else {
+			fmt.Println("Not contained")
 		}
-
+		fmt.Println()
 	}
 
 	fmt.Println("Part1:", fullyCointained)
@@ -81,11 +82,11 @@ func createMasks(pairs []assignmentRange) []assignmentMask {
 	}
 
 	// Calcualte needed mask sub slices
-	fmt.Println("maxbound", maxBound)
 	d := float64(maxBound) / strconv.IntSize
-	fmt.Println("d", d)
 	subSliceCount := uint(math.Ceil(d))
-	fmt.Println("subslicecount", subSliceCount)
+	// fmt.Println("maxbound", maxBound)
+	// fmt.Println("d", d)
+	// fmt.Println("subslicecount", subSliceCount)
 
 	// equal number of masks needed as pairs
 	masks := make([]assignmentMask, len(pairs))
