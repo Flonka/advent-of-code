@@ -68,11 +68,10 @@ func main() {
 }
 
 func printMasks(masks []assignmentMask) {
-	// TODO: Print Intsize
+	maskFormat := fmt.Sprintf("%%0%vb", strconv.IntSize)
 	for _, assignment := range masks {
 		for i := len(assignment) - 1; i >= 0; i-- {
-
-			fmt.Printf("%064b", assignment[i])
+			fmt.Printf(maskFormat, assignment[i])
 		}
 		fmt.Println()
 	}
