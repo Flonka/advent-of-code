@@ -55,7 +55,12 @@ func main() {
 
 func printMasks(masks []assignmentMask) {
 	// TODO: Print Intsize
-	fmt.Printf("%064b\n%064b\n", masks[0], masks[1])
+	for _, assignment := range masks {
+		for i := len(assignment) - 1; i >= 0; i-- {
+			fmt.Printf("%064b", assignment[i])
+		}
+		fmt.Println()
+	}
 
 	// fmt.Printf("AND \t %010b\n", masks[0]&masks[1])
 	// fmt.Printf("OR \t %010b\n", masks[0]|masks[1])
@@ -75,23 +80,35 @@ func createMasks(pairs []assignmentRange) []assignmentMask {
 		}
 	}
 
-	// Calcualte needed mask slices
+	// Calcualte needed mask sub slices
 	fmt.Println("maxbound", maxBound)
 	d := float64(maxBound) / strconv.IntSize
 	fmt.Println("d", d)
-	m := uint(math.Ceil(d))
-	fmt.Println("found m", m)
+	subSliceCount := uint(math.Ceil(d))
+	fmt.Println("subslicecount", subSliceCount)
 
 	// equal number of masks needed as pairs
 	masks := make([]assignmentMask, len(pairs))
 
 	for maskI, v := range pairs {
 
-		masks[maskI] = make(assignmentMask, 2)
+		masks[maskI] = make(assignmentMask, subSliceCount)
 
-		for i := v.start; i <= v.end; i++ {
-			vv := masks[maskI][0]
-			masks[maskI][0] = setBit(vv, i-1)
+		// assignmentRange is not 1-indexed, so reduce by one for the
+		// 0index bit mask, in assignmentmasks
+		for i := v.start - 1; i <= v.end-1; i++ {
+			// Find correct subslice to set bit on
+			// based on i
+			subIndex := int(math.Floor(float64(i) / strconv.IntSize))
+			// bit position to set  need to be relative to subslice position
+			pos := i - (uint(subIndex) * strconv.IntSize)
+			// if subIndex > 0 {
+			// 	fmt.Println(subIndex, pos)
+			// }
+
+			vv := masks[maskI][subIndex]
+			masks[maskI][subIndex] = setBit(vv, pos)
+			// fmt.Printf("%064b\n", masks[maskI][subIndex])
 		}
 
 	}
@@ -123,14 +140,28 @@ func setBit(n uint, pos uint) uint {
 // Returns whether any assignment is contained in
 // any of the other assignments
 func isContained(assignments []assignmentMask) bool {
-	for i, a := range assignments[0] {
 
-		for j, b := range assignments[0] {
+	// Loop assignments over each other, comparing all with all
+	for i, assignmentA := range assignments {
+		for j, assignmentB := range assignments {
+			// Skip comparing same assignmentMask
 			if j == i {
 				continue
 			}
 
-			if (a & b) == a {
+			// Compare assignments, each mask has potentially N uint masks
+			// lengths of assignmentmasks must be the same.
+			neededForContained := len(assignmentA)
+			var count int
+			for i := 0; i < neededForContained; i++ {
+				maskA := assignmentA[i]
+				maskB := assignmentB[i]
+				if (maskA & maskB) == maskA {
+					count++
+				}
+			}
+
+			if count == neededForContained {
 				return true
 			}
 		}
