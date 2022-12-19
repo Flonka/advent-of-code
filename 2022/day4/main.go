@@ -21,6 +21,7 @@ func main() {
 	s := input.OpenFileBuffered("input")
 
 	var fullyCointained int
+	var overlapping int
 	for s.Scan() {
 		line := s.Text()
 		// Get pairs
@@ -42,33 +43,39 @@ func main() {
 		// and increment counter
 		fmt.Println(pairs)
 		printMasks(masks)
-		if isContained(masks) {
+
+		containedFunc := func(a, b uint) bool {
+			return (a & b) == a
+		}
+
+		overlapFunc := func(a, b uint) bool {
+			return a&b > 0
+		}
+
+		if bitmaskComp(masks, true, containedFunc) {
 			fmt.Println("Contained")
 			fullyCointained++
-		} else {
-			fmt.Println("Not contained")
+		}
+		if bitmaskComp(masks, false, overlapFunc) {
+			fmt.Println("Overlapping")
+			overlapping++
 		}
 		fmt.Println()
 	}
 
 	fmt.Println("Part1:", fullyCointained)
+	fmt.Println("Part2:", overlapping)
 }
 
 func printMasks(masks []assignmentMask) {
 	// TODO: Print Intsize
 	for _, assignment := range masks {
 		for i := len(assignment) - 1; i >= 0; i-- {
+
 			fmt.Printf("%064b", assignment[i])
 		}
 		fmt.Println()
 	}
-
-	// fmt.Printf("AND \t %010b\n", masks[0]&masks[1])
-	// fmt.Printf("OR \t %010b\n", masks[0]|masks[1])
-	// fmt.Printf("XOR \t%010b\n", masks[0]^masks[1])
-	// fmt.Printf("NOT \t%010b\n", ^masks[0])
-	// fmt.Printf("NOT \t%010b\n", ^masks[1])
-	// fmt.Printf("ANDNOT \t%010b\n", masks[0]&^masks[1])
 }
 
 // createMasks creates assignmentMask slice from given assignmentRange slice
@@ -84,9 +91,6 @@ func createMasks(pairs []assignmentRange) []assignmentMask {
 	// Calcualte needed mask sub slices
 	d := float64(maxBound) / strconv.IntSize
 	subSliceCount := uint(math.Ceil(d))
-	// fmt.Println("maxbound", maxBound)
-	// fmt.Println("d", d)
-	// fmt.Println("subslicecount", subSliceCount)
 
 	// equal number of masks needed as pairs
 	masks := make([]assignmentMask, len(pairs))
@@ -103,13 +107,9 @@ func createMasks(pairs []assignmentRange) []assignmentMask {
 			subIndex := int(math.Floor(float64(i) / strconv.IntSize))
 			// bit position to set  need to be relative to subslice position
 			pos := i - (uint(subIndex) * strconv.IntSize)
-			// if subIndex > 0 {
-			// 	fmt.Println(subIndex, pos)
-			// }
 
 			vv := masks[maskI][subIndex]
 			masks[maskI][subIndex] = setBit(vv, pos)
-			// fmt.Printf("%064b\n", masks[maskI][subIndex])
 		}
 
 	}
@@ -138,12 +138,18 @@ func setBit(n uint, pos uint) uint {
 	return n
 }
 
-// Returns whether any assignment is contained in
-// any of the other assignments
-func isContained(assignments []assignmentMask) bool {
+// Returns whether operatorFunc is true for comparing two masks for
+// any of the given masks.
+// matchAll sets if the operation needs to match all bitmasks between assignments.
+func bitmaskComp(assignments []assignmentMask, matchAll bool, operatorFunc func(a, b uint) bool) bool {
 
 	// Loop assignments over each other, comparing all with all
 	for i, assignmentA := range assignments {
+
+		var matchCount int = 1
+		if matchAll {
+			matchCount = len(assignmentA)
+		}
 		for j, assignmentB := range assignments {
 			// Skip comparing same assignmentMask
 			if j == i {
@@ -152,19 +158,18 @@ func isContained(assignments []assignmentMask) bool {
 
 			// Compare assignments, each mask has potentially N uint masks
 			// lengths of assignmentmasks must be the same.
-			neededForContained := len(assignmentA)
 			var count int
-			for i := 0; i < neededForContained; i++ {
+			for i := 0; i < len(assignmentA); i++ {
 				maskA := assignmentA[i]
 				maskB := assignmentB[i]
-				if (maskA & maskB) == maskA {
+				if operatorFunc(maskA, maskB) {
 					count++
+					if count == matchCount {
+						return true
+					}
 				}
 			}
 
-			if count == neededForContained {
-				return true
-			}
 		}
 	}
 
