@@ -52,31 +52,48 @@ func main() {
 				if r != ' ' {
 					stacks[i].crates = append(stacks[i].crates, r)
 				}
-				// if r == ' ' {
-				// 	fmt.Println("Empty crate")
-				// } else {
-				// 	stacks[i].crates = append(stacks[i].crates, r)
-				// }
 			}
 		}
 
 		if c > 9 {
 			// Read commands, alter stacks.
 			command := readMoveCmd(line)
-			applyCommand(command, stacks)
+			// applyCommand(command, stacks)
+			applyCommand2(command, stacks)
 		}
 
 		c++
 	}
 
-	// Part1: Print top crate of each stack
-	fmt.Print("Part1 : ")
+	fmt.Print("Topstacks : ")
 	for _, v := range stacks {
 		fmt.Print(string(v.crates[0]))
 	}
 	fmt.Println()
 }
 
+// Part2 logic
+func applyCommand2(c moveCmd, stacks []stack) {
+	from := stacks[c.fromStack-1].crates
+	to := stacks[c.toStack-1].crates
+
+	to = prependSlice(to, from[:c.crateCount])
+	// Remove moved crates
+	from = from[c.crateCount:]
+
+	// Update stack crate slices
+	stacks[c.toStack-1].crates = to
+	stacks[c.fromStack-1].crates = from
+}
+
+func prependSlice(x []rune, y []rune) []rune {
+	x = append(x, y...)
+	copy(x[len(y):], x)
+	copy(x[:len(y)], y)
+	return x
+}
+
+// Part1 logic
 func applyCommand(c moveCmd, stacks []stack) {
 	from := stacks[c.fromStack-1].crates
 	to := stacks[c.toStack-1].crates
