@@ -46,7 +46,6 @@ func main() {
 		line := s.Text()
 
 		if c < 8 {
-			fmt.Println(line)
 			// Create stack data structure
 			crates := readCrateLine([]rune(line))
 			for i, r := range crates {
@@ -65,14 +64,13 @@ func main() {
 			// Read commands, alter stacks.
 			command := readMoveCmd(line)
 			applyCommand(command, stacks)
-			// break
 		}
 
 		c++
 	}
 
 	// Part1: Print top crate of each stack
-	fmt.Println(stacks)
+	fmt.Print("Part1 : ")
 	for _, v := range stacks {
 		fmt.Print(string(v.crates[0]))
 	}
@@ -80,18 +78,18 @@ func main() {
 }
 
 func applyCommand(c moveCmd, stacks []stack) {
-	from := stacks[c.fromStack-1]
-	to := stacks[c.toStack-1]
+	from := stacks[c.fromStack-1].crates
+	to := stacks[c.toStack-1].crates
 
 	// Move one crate at a time, last pos in crate slice is bottom
 	for i := 0; i < c.crateCount; i++ {
-		to.crates = prepend(to.crates, from.crates[0])
-		from.crates = from.crates[1:]
+		to = prepend(to, from[0])
+		from = from[1:]
 	}
 
-	// Update stack refs
-	stacks[c.toStack-1].crates = to.crates
-	stacks[c.fromStack-1].crates = from.crates
+	// Update stack crate slices
+	stacks[c.toStack-1].crates = to
+	stacks[c.fromStack-1].crates = from
 
 }
 
