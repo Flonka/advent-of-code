@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"strconv"
 	"strings"
 
 	"github.com/Flonka/advent-of-code/input"
@@ -20,6 +22,12 @@ func (s stack) String() string {
 	return b.String()
 }
 
+type moveCmd struct {
+	crateCount int
+	fromStack  int
+	toStack    int
+}
+
 // Hardcoded parsing follows after inspecting the input file.
 // First 8 lines are the stacks
 const stackCount = 9
@@ -31,35 +39,89 @@ func main() {
 
 	var stacks []stack = make([]stack, stackCount)
 	for _, stack := range stacks {
-		stack.crates = make([]rune, 0, 20)
+		stack.crates = make([]rune, 0, 50)
 	}
 
 	for s.Scan() {
 		line := s.Text()
-		fmt.Println(line)
 
 		if c < 8 {
+			fmt.Println(line)
 			// Create stack data structure
 			crates := readCrateLine([]rune(line))
 			for i, r := range crates {
-				if r == ' ' {
-					fmt.Println("Empty crate")
-				} else {
+				if r != ' ' {
 					stacks[i].crates = append(stacks[i].crates, r)
 				}
+				// if r == ' ' {
+				// 	fmt.Println("Empty crate")
+				// } else {
+				// 	stacks[i].crates = append(stacks[i].crates, r)
+				// }
 			}
 		}
 
-		if c > 8 {
+		if c > 9 {
 			// Read commands, alter stacks.
-			fmt.Println(stacks)
-			break
+			command := readMoveCmd(line)
+			applyCommand(command, stacks)
+			// break
 		}
 
 		c++
 	}
 
 	// Part1: Print top crate of each stack
+	fmt.Println(stacks)
+	for _, v := range stacks {
+		fmt.Print(string(v.crates[0]))
+	}
+	fmt.Println()
+}
+
+func applyCommand(c moveCmd, stacks []stack) {
+	from := stacks[c.fromStack-1]
+	to := stacks[c.toStack-1]
+
+	// Move one crate at a time, last pos in crate slice is bottom
+	for i := 0; i < c.crateCount; i++ {
+		to.crates = prepend(to.crates, from.crates[0])
+		from.crates = from.crates[1:]
+	}
+
+	// Update stack refs
+	stacks[c.toStack-1].crates = to.crates
+	stacks[c.fromStack-1].crates = from.crates
+
+}
+
+func prepend(x []rune, y rune) []rune {
+	x = append(x, 0)
+	copy(x[1:], x)
+	x[0] = y
+	return x
+}
+
+func readMoveCmd(line string) moveCmd {
+
+	s := strings.Split(line, " ")
+	c1, err := strconv.Atoi(s[1])
+	if err != nil {
+		os.Exit(1)
+	}
+	c2, err := strconv.Atoi(s[3])
+	if err != nil {
+		os.Exit(1)
+	}
+	c3, err := strconv.Atoi(s[5])
+	if err != nil {
+		os.Exit(1)
+	}
+	return moveCmd{
+		crateCount: c1,
+		fromStack:  c2,
+		toStack:    c3,
+	}
 }
 
 func readCrateLine(line []rune) []rune {
