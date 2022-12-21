@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 
@@ -10,40 +11,49 @@ import (
 )
 
 func main() {
-	s := input.OpenFileBuffered("input")
-	s.Split(bufio.ScanRunes)
 
+	fmt.Println("Part1", scanUnique(4))
+	fmt.Println("Part2", scanUnique(14))
+}
+
+func scanUnique(n int) int {
+	s := input.OpenFileBuffered("input")
+
+	s.Split(bufio.ScanRunes)
 	var scanCount int
-	var last4 string
+	var compString string
 	// Fill chars
-	for i := 0; i < 4; i++ {
+	for i := 0; i < n; i++ {
 		if !s.Scan() {
 			os.Exit(1)
 		}
 		scanCount++
 
-		last4 = last4 + s.Text()
+		compString = compString + s.Text()
+	}
+
+	if len(compString) != n {
+		log.Fatal("Not correct length")
 	}
 
 	// Compare
-	if isMarker(last4) {
-		fmt.Println(scanCount)
+	if isMarker(compString) {
+		return scanCount
 	}
 
 	for s.Scan() {
 		scanCount++
 		c := s.Text()
-		// Update last4
-		last4 = last4[1:] + c
+		// Update string
+		compString = compString[1:] + c
 
-		if isMarker(last4) {
-			fmt.Println("Found it")
-			fmt.Println(last4)
+		if isMarker(compString) {
+			fmt.Println("Found it", compString)
 			break
 		}
 	}
 
-	fmt.Println("scan count:", scanCount)
+	return scanCount
 }
 
 func isMarker(chars string) bool {
