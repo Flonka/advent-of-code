@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -44,9 +45,6 @@ func main() {
 
 	updateSizesRecursion(fileTree)
 
-	// Find all of the directories with a total
-	// size of at most 100000. What is the sum of the total sizes of those directories?
-
 	printTree(fileTree)
 }
 
@@ -66,20 +64,41 @@ func printTree(root *node) {
 	q := make([]*node, 0, 100)
 	q = append(q, root)
 
+	// Find all of the directories with a total
+	// size of at most 100000. What is the sum of the total sizes of those directories?
 	var part1 int
+
+	// Part2
+	// The total disk space available to the filesystem is 70000000.
+	// To run the update, you need unused space of at least 30000000.
+	unused := 70000000 - root.size
+	needed := 30000000 - unused
+
+	var part2 []int
 
 	for len(q) > 0 {
 		n := q[0]
 		q = q[1:]
-		q = append(q, n.children...)
+
+		for _, child := range n.children {
+			if child.children != nil {
+				q = append(q, child)
+			}
+		}
 
 		// If it is a dir and size limit
-		if n.children != nil && n.size <= 100000 {
+		if n.size <= 100000 {
 			part1 += n.size
 		}
-	}
 
+		if n.size >= needed {
+			part2 = append(part2, n.size)
+		}
+	}
+	sort.Ints(part2)
 	fmt.Println("part1", part1)
+	fmt.Println("part2", part2[0])
+
 }
 
 func readFS(p string) *node {
