@@ -42,22 +42,44 @@ func main() {
 	// Build file tree structure from input
 	fileTree := readFS("input")
 
+	updateSizesRecursion(fileTree)
+
 	// Find all of the directories with a total
 	// size of at most 100000. What is the sum of the total sizes of those directories?
 
-	printNodeTree(fileTree)
+	printTree(fileTree)
 }
 
-func printNodeTree(root *node) {
+func updateSizesRecursion(n *node) int {
+	for _, child := range n.children {
+		// Isdir (child slice is nil), should be a flag..
+		if child.children != nil {
+			n.size += updateSizesRecursion(child)
+		} else {
+			n.size += child.size
+		}
+	}
+	return n.size
+}
+
+func printTree(root *node) {
 	q := make([]*node, 0, 100)
 	q = append(q, root)
 
+	var part1 int
+
 	for len(q) > 0 {
 		n := q[0]
-		fmt.Println(n)
 		q = q[1:]
 		q = append(q, n.children...)
+
+		// If it is a dir and size limit
+		if n.children != nil && n.size <= 100000 {
+			part1 += n.size
+		}
 	}
+
+	fmt.Println("part1", part1)
 }
 
 func readFS(p string) *node {
