@@ -44,11 +44,8 @@ func visibleToOutside(x, y, w, h, treeHeight int, data [][]int) bool {
 	for xPos := x - 1; xPos >= 0; xPos-- {
 		t := data[y][xPos]
 		if t >= compareHeight {
-			fmt.Println("Early exit x--", t, compareHeight)
 			blocked = true
 			break
-		} else {
-			compareHeight = t
 		}
 	}
 
@@ -58,15 +55,11 @@ func visibleToOutside(x, y, w, h, treeHeight int, data [][]int) bool {
 
 	// Reset
 	blocked = false
-	compareHeight = treeHeight
 	for xPos := x + 1; xPos <= w; xPos++ {
 		t := data[y][xPos]
 		if t >= compareHeight {
-			fmt.Println("Early exit x++", t, compareHeight)
 			blocked = true
 			break
-		} else {
-			compareHeight = t
 		}
 	}
 
@@ -75,15 +68,11 @@ func visibleToOutside(x, y, w, h, treeHeight int, data [][]int) bool {
 	}
 
 	blocked = false
-	compareHeight = treeHeight
 	for yPos := y - 1; yPos >= 0; yPos-- {
 		t := data[yPos][x]
 		if t >= compareHeight {
-			fmt.Println("Early exit y--", t, compareHeight)
 			blocked = true
 			break
-		} else {
-			compareHeight = t
 		}
 	}
 	if !blocked {
@@ -91,15 +80,11 @@ func visibleToOutside(x, y, w, h, treeHeight int, data [][]int) bool {
 	}
 
 	blocked = false
-	compareHeight = treeHeight
 	for yPos := y + 1; yPos <= h; yPos++ {
 		t := data[yPos][x]
 		if t >= compareHeight {
-			fmt.Println("Early exit y++", t, compareHeight)
 			blocked = true
 			break
-		} else {
-			compareHeight = t
 		}
 	}
 
