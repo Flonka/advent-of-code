@@ -18,21 +18,71 @@ func main() {
 	fmt.Println("height", h)
 
 	visibleTrees := 0
+	maxScenicScore := 0
 	for y, row := range d {
 		for x, tree := range row {
 
+			atE := atEdge(x, y, w, h)
 			// Is tree at edge?-> visible
 			// else
 			// Traverse data for given position in all directions
-			if atEdge(x, y, w, h) || visibleToOutside(x, y, w, h, tree, d) {
+			if atE || visibleToOutside(x, y, w, h, tree, d) {
 				visibleTrees++
+			}
+
+			if !atE {
+				s := calculateScenicScore(x, y, w, h, tree, d)
+
+				if s > maxScenicScore {
+					maxScenicScore = s
+				}
 			}
 
 		}
 	}
 
 	fmt.Println("Visible trees from outside", visibleTrees)
+	fmt.Println("MaxScenicScore", maxScenicScore)
 
+}
+
+func calculateScenicScore(x, y, w, h, treeHeight int, data [][]int) int {
+
+	var leftVis, rightVis, upVis, downVis int
+	compareHeight := treeHeight
+	for xPos := x - 1; xPos >= 0; xPos-- {
+		leftVis++
+		t := data[y][xPos]
+		if t >= compareHeight {
+			break
+		}
+	}
+
+	for xPos := x + 1; xPos <= w; xPos++ {
+		rightVis++
+		t := data[y][xPos]
+		if t >= compareHeight {
+			break
+		}
+	}
+
+	for yPos := y - 1; yPos >= 0; yPos-- {
+		upVis++
+		t := data[yPos][x]
+		if t >= compareHeight {
+			break
+		}
+	}
+
+	for yPos := y + 1; yPos <= h; yPos++ {
+		downVis++
+		t := data[yPos][x]
+		if t >= compareHeight {
+			break
+		}
+	}
+
+	return leftVis * rightVis * upVis * downVis
 }
 
 func visibleToOutside(x, y, w, h, treeHeight int, data [][]int) bool {
