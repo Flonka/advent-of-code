@@ -7,16 +7,12 @@ import (
 	"strings"
 
 	"github.com/Flonka/advent-of-code/input"
+	"github.com/Flonka/advent-of-code/vector"
 )
 
-type vec2 struct {
-	x int
-	y int
-}
-
 type state struct {
-	head vec2
-	tail vec2
+	head vector.Vec2
+	tail vector.Vec2
 }
 
 func main() {
@@ -24,10 +20,10 @@ func main() {
 
 	ropeState := state{}
 
-	visited := make(map[vec2]int)
+	visited := make(map[vector.Vec2]int)
 
 	// 0,0 visited (startpos)
-	visited[vec2{}]++
+	visited[vector.Vec2{}]++
 
 	for s.Scan() {
 		line := s.Text()
@@ -54,17 +50,17 @@ func main() {
 	}
 }
 
-func getDir(s string) vec2 {
-	v := vec2{}
+func getDir(s string) vector.Vec2 {
+	v := vector.Vec2{}
 	switch s {
 	case "U":
-		v.y = 1
+		v.Y = 1
 	case "D":
-		v.y = -1
+		v.Y = -1
 	case "L":
-		v.x = -1
+		v.X = -1
 	case "R":
-		v.x = 1
+		v.X = 1
 	default:
 		fmt.Println("Unhandled dir", s)
 		os.Exit(1)
@@ -74,10 +70,39 @@ func getDir(s string) vec2 {
 }
 
 // updateState updates the state and returns new visited tail positions
-func updateState(s *state, direction vec2, amount int) []vec2 {
+func updateState(s *state, direction vector.Vec2, amount int) []vector.Vec2 {
 
-	tails := make([]vec2, 0, amount)
-	// fmt.Println(direction, amount)
+	tails := make([]vector.Vec2, 0, amount)
+
+	fmt.Println(direction, amount)
+	fmt.Println("state", s)
+
+	d := vector.Vec2{}
+
+	for i := 0; i < amount; i++ {
+		// Progress head
+		h := s.head
+		t := s.tail
+
+		h.Add(&direction)
+
+		fmt.Println(d, h)
+
+		d = h
+		d.Subtract(&t)
+
+		// If distance greater than 1 , tail needs to move
+		fmt.Println("diff", d, "l", d.Length())
+
+		
+
+		// Update state
+		s.head = h
+		s.tail = t
+	}
+	fmt.Println("state", s)
+
+	os.Exit(1)
 
 	return tails
 }
