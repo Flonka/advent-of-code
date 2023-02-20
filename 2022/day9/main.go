@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -41,13 +42,16 @@ func main() {
 		newTailPositions := updateState(&ropeState, direction, amount)
 		for _, p := range newTailPositions {
 			visited[p]++
+			// fmt.Println(p)
 		}
 
 	}
 
-	for k, v := range visited {
-		fmt.Println(k, v)
-	}
+	// for k, v := range visited {
+	// 	fmt.Println(k, v)
+	// }
+	fmt.Println("Part1", len(visited))
+
 }
 
 func getDir(s string) vector.Vec2 {
@@ -74,8 +78,8 @@ func updateState(s *state, direction vector.Vec2, amount int) []vector.Vec2 {
 
 	tails := make([]vector.Vec2, 0, amount)
 
-	fmt.Println(direction, amount)
-	fmt.Println("state", s)
+	// fmt.Println(direction, amount)
+	// fmt.Println("state", s)
 
 	d := vector.Vec2{}
 
@@ -84,25 +88,45 @@ func updateState(s *state, direction vector.Vec2, amount int) []vector.Vec2 {
 		h := s.head
 		t := s.tail
 
+		// Move head with direction
 		h.Add(&direction)
 
-		fmt.Println(d, h)
-
+		// Calculate difference d
 		d = h
 		d.Subtract(&t)
 
-		// If distance greater than 1 , tail needs to move
-		fmt.Println("diff", d, "l", d.Length())
-
-		
+		// If any axis distance greater than 1 , tail needs to move
+		if d.X > 1 || d.X < -1 || d.Y > 1 || d.Y < -1 {
+			fixD(&d)
+			t.Add(&d)
+		}
 
 		// Update state
 		s.head = h
 		s.tail = t
-	}
-	fmt.Println("state", s)
 
-	os.Exit(1)
+		tails = append(tails, t)
+	}
 
 	return tails
+}
+
+// Reduce v to move one step , or diagonal one step per axis
+func fixD(v *vector.Vec2) {
+	xNeg := math.Signbit(float64(v.X))
+	yNeg := math.Signbit(float64(v.Y))
+
+	if v.X != 0 {
+		v.X /= v.X
+	}
+	if v.Y != 0 {
+		v.Y /= v.Y
+	}
+
+	if xNeg {
+		v.X = -v.X
+	}
+	if yNeg {
+		v.Y = -v.Y
+	}
 }
