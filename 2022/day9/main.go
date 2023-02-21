@@ -16,15 +16,25 @@ type state struct {
 	tail vector.Vec2
 }
 
+type multiKnotState struct {
+	knots []vector.Vec2
+}
+
 func main() {
 	s := input.OpenFileBuffered("input")
 
 	ropeState := state{}
 
+	multiState := multiKnotState{
+		knots: make([]vector.Vec2, 10),
+	}
+
 	visited := make(map[vector.Vec2]int)
+	visited2 := make(map[vector.Vec2]int)
 
 	// 0,0 visited (startpos)
 	visited[vector.Vec2{}]++
+	visited2[vector.Vec2{}]++
 
 	for s.Scan() {
 		line := s.Text()
@@ -42,15 +52,17 @@ func main() {
 		newTailPositions := updateState(&ropeState, direction, amount)
 		for _, p := range newTailPositions {
 			visited[p]++
-			// fmt.Println(p)
+		}
+
+		t2Pos := updateMultiState(multiState, direction, amount)
+		for _, p := range t2Pos {
+			visited2[p]++
 		}
 
 	}
 
-	// for k, v := range visited {
-	// 	fmt.Println(k, v)
-	// }
 	fmt.Println("Part1", len(visited))
+	fmt.Println("Part2", len(visited2))
 
 }
 
@@ -73,13 +85,24 @@ func getDir(s string) vector.Vec2 {
 	return v
 }
 
+func updateMultiState(s *multiKnotState, direction vector.Vec2, amount int) []vector.Vec2 {
+	tails := make([]vector.Vec2, 0, amount)
+	d := vector.Vec2{}
+
+	for i := 0; i < amount; i++ {
+		for knotIndex := 0; knotIndex < len(s.knots)-1; knotIndex++ {
+			h := s.knots[knotIndex]
+			t := s.knots[knotIndex+1]
+		}
+	}
+
+	return tails
+}
+
 // updateState updates the state and returns new visited tail positions
 func updateState(s *state, direction vector.Vec2, amount int) []vector.Vec2 {
 
 	tails := make([]vector.Vec2, 0, amount)
-
-	// fmt.Println(direction, amount)
-	// fmt.Println("state", s)
 
 	d := vector.Vec2{}
 
