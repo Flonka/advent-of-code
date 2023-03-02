@@ -46,12 +46,30 @@ func main() {
 		for runCycles > 0 {
 			if cycleCount == cycleCheck {
 				signal := cycleCount * X
-				fmt.Println(cycleCount, signal)
-				signalSum+=signal
+				// fmt.Println(cycleCount, signal)
+				signalSum += signal
 				cycleCheck += 40
 			}
-			cycleCount++
 
+			// Check if sprite X (middle pos) +-1 is the current row pixel index
+			rowPix := cycleCount % 40
+			if rowPix == 0 {
+				rowPix = 39
+			} else {
+				rowPix = rowPix -1 
+			}
+
+			drawValue := "."
+			if (X-1) == rowPix || X == rowPix || (X+1) == rowPix {
+				drawValue = "#"
+			}
+
+			fmt.Print(drawValue)
+			if rowPix == 39 {
+				fmt.Print("\n")
+			}
+
+			cycleCount++
 			runCycles--
 		}
 
