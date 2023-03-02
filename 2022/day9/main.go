@@ -54,7 +54,7 @@ func main() {
 			visited[p]++
 		}
 
-		t2Pos := updateMultiState(multiState, direction, amount)
+		t2Pos := updateMultiState(&multiState, direction, amount)
 		for _, p := range t2Pos {
 			visited2[p]++
 		}
@@ -90,9 +90,34 @@ func updateMultiState(s *multiKnotState, direction vector.Vec2, amount int) []ve
 	d := vector.Vec2{}
 
 	for i := 0; i < amount; i++ {
+		// Move actual head with direction , then perform the "follow head logic"
+		head := s.knots[0]
+		head.Add(&direction)
+		s.knots[0] = head
+
+		// check diff and update
 		for knotIndex := 0; knotIndex < len(s.knots)-1; knotIndex++ {
 			h := s.knots[knotIndex]
 			t := s.knots[knotIndex+1]
+
+
+			// Calculate difference d
+			d = h
+			d.Subtract(&t)
+
+			// If any axis distance greater than 1 , tail needs to move
+			if d.X > 1 || d.X < -1 || d.Y > 1 || d.Y < -1 {
+				fixD(&d)
+				t.Add(&d)
+			}
+
+			// Update state
+			// s.knots[knotIndex] = h
+			s.knots[knotIndex+1] = t
+
+			if knotIndex+1 == len(s.knots)-1 {
+				tails = append(tails, t)
+			}
 		}
 	}
 
