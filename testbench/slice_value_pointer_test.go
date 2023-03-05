@@ -1,6 +1,7 @@
 package testbench_test
 
 // https://philpearl.github.io/post/bad_go_slice_of_pointers/
+// Extra bench tool : https://pkg.go.dev/golang.org/x/perf/cmd/benchstat
 
 import "testing"
 
