@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/Flonka/advent-of-code/2022/day11"
+	"github.com/Flonka/advent-of-code/input"
 )
 
 func main() {
@@ -11,8 +13,8 @@ func main() {
 	// Read monkeys
 	monkeys := readData("input.txt")
 
-	for _, m := range monkeys {
-		fmt.Println(m)
+	for i, m := range monkeys {
+		fmt.Println("Monkey", i, m)
 	}
 
 	/*
@@ -25,5 +27,22 @@ func main() {
 }
 
 func readData(f string) []day11.Monkey {
+	s := input.OpenFileBuffered(f)
 
+	monkeys := make([]day11.Monkey, 0, 10)
+	for s.Scan() {
+		l := s.Text()
+
+		if strings.HasPrefix(l, "Monkey") {
+			monkeyLines := make([]string, 0, 5)
+			for i := 0; i < 5; i++ {
+				s.Scan()
+				monkeyLines = append(monkeyLines, s.Text())
+			}
+
+			monkeys = append(monkeys, day11.NewMonkeyFromLines(monkeyLines))
+		}
+	}
+
+	return monkeys
 }
