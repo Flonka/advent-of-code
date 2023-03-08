@@ -2,17 +2,19 @@ package day11
 
 import (
 	"fmt"
+	"math"
 	"os"
 	"strconv"
 	"strings"
 )
 
 type Monkey struct {
-	items        []int
+	Items        []int
 	operation    operation
-	inspectCount int
+	InspectCount int
 	test         test
 }
+
 type operation struct {
 	fun  func(int, int) int
 	oldA bool
@@ -21,7 +23,8 @@ type operation struct {
 	b    int
 }
 
-func (o *operation) Eval(old int) int {
+// eval returns the new worry value of input for this monkey
+func (o *operation) eval(old int) int {
 	var a, b int
 	if o.oldA {
 		a = old
@@ -67,7 +70,6 @@ func NewMonkeyFromLines(lines []string) Monkey {
 	// Operation
 	opLine := lines[1]
 	operatorStrings := strings.Split(opLine[strings.Index(opLine, "= ")+2:], " ")
-	fmt.Println(operatorStrings)
 	operator := operatorStrings[1]
 	var opFun func(int, int) int
 	switch operator {
@@ -99,7 +101,7 @@ func NewMonkeyFromLines(lines []string) Monkey {
 	}
 
 	return Monkey{
-		items:     items,
+		Items:     items,
 		operation: monkeyOp,
 		test:      monkeyTest,
 	}
@@ -138,4 +140,44 @@ func multOp(a, b int) int {
 
 func addOp(a, b int) int {
 	return a + b
+}
+
+type Throw struct {
+	Monkey int
+	Item   int
+}
+
+// InspectItems returns slice of Throw , indicating where to throw items.
+func (m *Monkey) InspectItems() []Throw {
+	/*
+		The monkeys take turns inspecting and throwing items. On a single monkey's turn, it inspects and throws all of the items it is holding one at a time and in the order listed. Monkey 0 goes first, then monkey 1, and so on until each monkey has had one turn. The process of each monkey taking a single turn is called a round.
+
+		When a monkey throws an item to another monkey, the item goes on the end of the recipient monkey's list. A monkey that starts a round with no items could end up inspecting and throwing many items by the time its turn comes around. If a monkey is holding no items at the start of its turn, its turn ends.
+
+	*/
+
+	t := make([]Throw, 0, len(m.Items))
+
+	for _, v := range m.Items {
+		newV := m.operation.eval(v)
+		m.InspectCount++
+		// div by 3 round down
+		newV = int(math.Floor(float64(newV) / 3))
+
+		var targetIndex int
+		if newV%m.test.parameter == 0 {
+			targetIndex = m.test.successTarget
+		} else {
+			targetIndex = m.test.failureTarget
+		}
+
+		t = append(t, Throw{
+			Monkey: targetIndex,
+			Item:   newV,
+		})
+	}
+
+	m.Items = nil
+
+	return t
 }
