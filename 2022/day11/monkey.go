@@ -51,7 +51,6 @@ Starting items: 98, 97, 98, 55, 56, 72
 */
 func NewMonkeyFromLines(lines []string) Monkey {
 
-	// fmt.Println(lines)
 	// items
 	itemString := lines[0][strings.Index(lines[0], ":")+1:]
 	itemStrings := strings.Split(itemString, ",")
@@ -64,7 +63,6 @@ func NewMonkeyFromLines(lines []string) Monkey {
 		}
 		items = append(items, v)
 	}
-	// fmt.Println(lines[0], "->", items)
 
 	// Operation
 	opLine := lines[1]
@@ -82,26 +80,56 @@ func NewMonkeyFromLines(lines []string) Monkey {
 		fmt.Println("Unhandled operator", operator)
 		os.Exit(1)
 	}
-	// Check if "old" for A / B
-	opA, err := strconv.Atoi(operatorStrings[0])
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+	opA, oldA := opParse(operatorStrings[0])
+	opB, oldB := opParse(operatorStrings[2])
+
+	monkeyOp := operation{
+		fun:  opFun,
+		a:    opA,
+		b:    opB,
+		oldA: oldA,
+		oldB: oldB,
 	}
-	opB, err := strconv.Atoi(operatorStrings[2])
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+
+	// Test
+	monkeyTest := test{
+		parameter:     lastIntOfLine(lines[2]),
+		successTarget: lastIntOfLine(lines[3]),
+		failureTarget: lastIntOfLine(lines[4]),
 	}
 
 	return Monkey{
-		items: items,
-		operation: operation{
-			fun: opFun,
-			a:   opA,
-			b:   opB,
-		},
+		items:     items,
+		operation: monkeyOp,
+		test:      monkeyTest,
 	}
+}
+
+func lastIntOfLine(line string) int {
+	ls := strings.Split(line, " ")
+	intString := ls[len(ls)-1]
+	number, err := strconv.Atoi(intString)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	return number
+
+}
+
+func opParse(op string) (int, bool) {
+
+	if op == "old" {
+		return 0, true
+	} else {
+		opValue, err := strconv.Atoi(op)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		return opValue, false
+	}
+
 }
 
 func multOp(a, b int) int {
