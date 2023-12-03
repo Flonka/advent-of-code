@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -20,11 +19,21 @@ func TestPart2(t *testing.T) {
 	for _, v := range input {
 
 		n := getNumberFromLine(v, true)
-		fmt.Println(n)
 		sum += n
 	}
 
 	if sum != 281 {
 		t.Fatal("Sum not correct")
 	}
+}
+
+func TestMultipleTextNumbers(t *testing.T) {
+
+	test := "4onefive6zsjhzvrjnsfive1five"
+
+	n := getNumberFromLine(test, true)
+	if n != 45 {
+		t.Errorf("Number %v != %v", n, 45)
+	}
+
 }

@@ -23,8 +23,10 @@ func main() {
 	sum2 := 0
 	for s.Scan() {
 		l := s.Text()
-		sum += getNumberFromLine(l, false)
-		sum2 += getNumberFromLine(l, true)
+		n1 := getNumberFromLine(l, false)
+		n2 := getNumberFromLine(l, true)
+		sum += n1
+		sum2 += n2
 		fmt.Println()
 	}
 
@@ -33,7 +35,7 @@ func main() {
 
 }
 
-var textNumbers = []string{"one", "two", "three", "four", "five", "six", "seven", "eight", "nine"}
+var textNumbers = []string{"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"}
 
 func getNumberFromLine(line string, includeTextNumbers bool) int {
 
@@ -41,11 +43,10 @@ func getNumberFromLine(line string, includeTextNumbers bool) int {
 	// textInts , lookup table for each index in the string
 	textInts := make([]int, utf8.RuneCountInString(line))
 	if includeTextNumbers == true {
-		for i, n := range textNumbers {
-			iResult := strings.Index(line, n)
-			if iResult >= 0 {
-				// Found number
-				textInts[iResult] = i + 1
+		for numberValue, textNumber := range textNumbers {
+			// Find all occurences of number
+			for _, i := range findAllIndices(line, textNumber) {
+				textInts[i] = numberValue
 			}
 		}
 		slog.Debug("Text numbers", "textInts", textInts, "line", line)
@@ -76,4 +77,23 @@ func getNumberFromLine(line string, includeTextNumbers bool) int {
 	}
 
 	return i
+}
+
+// findAllIndices, return slice of all indices where substring in s
+func findAllIndices(s string, substring string) []int {
+
+	indices := make([]int, 0)
+	result := strings.Index(s, substring)
+	fmt.Println("Find", substring, "in", s)
+	offset := 0
+	for result >= 0 {
+		indices = append(indices, result+offset)
+		// Step one character forwards
+		step := result + 1
+		s = s[step:]
+		// offset needs to be incremented with the same step
+		offset += step
+		result = strings.Index(s, substring)
+	}
+	return indices
 }
