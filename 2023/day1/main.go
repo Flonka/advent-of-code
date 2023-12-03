@@ -15,9 +15,8 @@ import (
 
 func main() {
 
-	logLevel := cli.Default()
+	cli.Default()
 
-	logLevel.Set(slog.LevelDebug)
 	s := input.OpenFileBuffered("input.txt")
 	sum := 0
 	sum2 := 0
@@ -84,7 +83,6 @@ func findAllIndices(s string, substring string) []int {
 
 	indices := make([]int, 0)
 	result := strings.Index(s, substring)
-	fmt.Println("Find", substring, "in", s)
 	offset := 0
 	for result >= 0 {
 		indices = append(indices, result+offset)
