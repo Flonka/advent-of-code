@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -28,6 +29,25 @@ type RevealSet struct {
 	Blue  int
 }
 
+func GetPowerOfSets(game *Game) int {
+	r := make([]int, 0, len(game.Reveals))
+	g := make([]int, 0, len(game.Reveals))
+	b := make([]int, 0, len(game.Reveals))
+	for _, rev := range game.Reveals {
+		r = append(r, rev.Red)
+		g = append(g, rev.Green)
+		b = append(b, rev.Blue)
+	}
+
+	pb := Bag{
+		Red:   slices.Max(r),
+		Green: slices.Max(g),
+		Blue:  slices.Max(b),
+	}
+
+	return pb.Red * pb.Green * pb.Blue
+}
+
 func main() {
 
 	cli.Default()
@@ -40,6 +60,7 @@ func main() {
 
 	s := input.OpenFileBuffered("input.txt")
 	part1 := 0
+	part2 := 0
 	for s.Scan() {
 
 		l := s.Text()
@@ -48,9 +69,15 @@ func main() {
 		if IsGamePossible(g, bag1) {
 			part1 += g.Id
 		}
+
+		// Part 2
+		// Find minimum of cubes needed per game
+		part2 += GetPowerOfSets(&g)
+
 	}
 
 	slog.Info("Part 1 Result", "result", part1)
+	slog.Info("Part 2 Result", "result", part2)
 }
 
 // IsGamePossible returns if the game is possible with the given bag.
