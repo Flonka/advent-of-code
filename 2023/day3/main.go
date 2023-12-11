@@ -38,7 +38,6 @@ func main() {
 
 		lastWasDigit := false
 		var digitAccumulation string
-		fmt.Println(line)
 		for _, s := range line {
 			if unicode.IsDigit(s) {
 				lastWasDigit = true
@@ -76,4 +75,17 @@ func main() {
 		row++
 	}
 
+	fmt.Println("part1", part1(digits, symbols))
+
+}
+
+func part1(digits []Digit, symbols map[spatial.DiscretePos2D]string) int {
+
+	sum := 0
+
+	for _, d := range digits {
+
+	}
+
+	return sum
 }
