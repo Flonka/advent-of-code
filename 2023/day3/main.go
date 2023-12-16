@@ -30,22 +30,23 @@ func (d *Digit) GetPerimiter() []spatial.DiscretePos2D {
 	row := d.End.Y - 1
 
 	startCol := d.End.X - l
+	endCol := d.End.X + 1
 
-	if row > 0 {
+	if row >= 0 {
 		// above row
-		for i := startCol; i <= d.End.X+1; i++ {
+		for i := startCol; i <= endCol; i++ {
 			p = append(p, spatial.DiscretePos2D{X: i, Y: row})
 		}
 	}
 
 	// left , right
-	p = append(p, spatial.DiscretePos2D{X: d.End.X - l - 1, Y: d.End.Y})
-	p = append(p, spatial.DiscretePos2D{X: d.End.X + 1, Y: d.End.Y})
+	p = append(p, spatial.DiscretePos2D{X: startCol, Y: d.End.Y})
+	p = append(p, spatial.DiscretePos2D{X: endCol, Y: d.End.Y})
 
 	row = d.End.Y + 1
 	if row < size {
 		// Below row
-		for i := startCol; i <= d.End.X+1; i++ {
+		for i := startCol; i <= endCol; i++ {
 			p = append(p, spatial.DiscretePos2D{X: i, Y: row})
 		}
 
@@ -69,7 +70,6 @@ func main() {
 
 	cli.Default()
 
-	// s := input.OpenFileBuffered("input.txt")
 	fileReader := input.OpenFile("input.txt")
 	defer fileReader.Close()
 	r := bufio.NewReader(fileReader)
@@ -90,16 +90,18 @@ func main() {
 			if unicode.IsDigit(s) {
 				lastWasDigit = true
 				digitAccumulation += string(s)
+				// Special case on last character
+				if col == size-1 {
+					digits = append(digits, createDigit(digitAccumulation, row, col))
+					// Reset
+					lastWasDigit = false
+					digitAccumulation = ""
+				}
 
 			} else { // Not a digit now
 				if lastWasDigit {
-
-					digitVal, err := strconv.Atoi(digitAccumulation)
-					if err != nil {
-						fmt.Println(err)
-						os.Exit(1)
-					}
-					digits = append(digits, Digit{Value: digitVal, End: spatial.DiscretePos2D{X: col - 1, Y: row}})
+					digits = append(digits, createDigit(digitAccumulation, row, col-1))
+					// Reset
 					lastWasDigit = false
 					digitAccumulation = ""
 				}
@@ -124,6 +126,19 @@ func main() {
 
 	fmt.Println("part1", part1(digits, symbols))
 
+}
+
+func createDigit(acc string, row int, col int) Digit {
+
+	digitVal, err := strconv.Atoi(acc)
+	pos := spatial.DiscretePos2D{X: col, Y: row}
+	if err != nil {
+		fmt.Println(err, pos)
+		os.Exit(1)
+	}
+
+	d := Digit{Value: digitVal, End: pos}
+	return d
 }
 
 func part1(digits []Digit, symbols map[spatial.DiscretePos2D]string) int {
