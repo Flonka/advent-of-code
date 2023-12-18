@@ -124,7 +124,8 @@ func main() {
 		row++
 	}
 
-	fmt.Println("part1", part1(digits, symbols))
+	p1, p2 := parts(digits, symbols)
+	fmt.Println("parts", p1, p2)
 
 }
 
@@ -141,18 +142,34 @@ func createDigit(acc string, row int, col int) Digit {
 	return d
 }
 
-func part1(digits []Digit, symbols map[spatial.DiscretePos2D]string) int {
+func parts(digits []Digit, symbols map[spatial.DiscretePos2D]string) (int, int) {
 
-	sum := 0
+	part1 := 0
+	part2 := 0
+
+	starCount := make(map[spatial.DiscretePos2D][]Digit)
 
 	for _, d := range digits {
 		for _, p := range d.GetPerimiter() {
-			_, present := symbols[p]
+			symbol, present := symbols[p]
 			if present {
-				sum += d.Value
+				part1 += d.Value
+
+				if symbol == "*" {
+					starCount[p] = append(starCount[p], d)
+
+				}
 			}
 		}
 	}
 
-	return sum
+	for _, v := range starCount {
+		if len(v) == 2 {
+
+			m := v[0].Value * v[1].Value
+			part2 += m
+		}
+	}
+
+	return part1, part2
 }
