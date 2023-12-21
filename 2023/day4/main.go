@@ -62,18 +62,63 @@ func main() {
 	s := input.OpenFileBuffered("input.txt")
 	part1 := 0
 
+	bonusCards := make([]int, 0, 100)
+	cardCount := 0
+
+	cc := 0
 	for s.Scan() {
+		fmt.Println("loop", cc)
+
 		line := s.Text()
 		c := CardFromLine(line)
-		part1 += part1Score(c)
+		matches := c.GetMatchCount()
+
+		// One for the looped card, plus one for each of the bonuses active
+		newCards := 1 + len(bonusCards)*matches
+		part1 += part1Score(matches)
+
+		// Add new bonuscards from matches
+		bonusCards = updateBonusCards(bonusCards)
+		fmt.Println("matches", matches)
+		fmt.Println("length before", len(bonusCards))
+		for i := 0; i < newCards; i++ {
+			bonusCards = append(bonusCards, matches)
+		}
+		fmt.Println("length after", len(bonusCards))
+		cardCount += newCards
+		if cc > 5 {
+			break
+		}
+		cc++
+		fmt.Println()
 	}
 
-	fmt.Println(part1)
+	fmt.Println("part1", part1)
+	fmt.Println("part2", cardCount)
 }
 
-func part1Score(c Card) int {
+func updateBonusCards(bonusCards []int) []int {
+	// Reduce current active bonuses for current line
+	for i := 0; i < len(bonusCards); i++ {
+		bonusCards[i] = bonusCards[i] - 1
+	}
+	slices.Sort(bonusCards)
+	for i := 0; i < len(bonusCards); i++ {
+		// Find first positive number
+		n := bonusCards[i]
+		if n > 0 {
+			// fmt.Println("before", bonusCards)
+			bonusCards = slices.Delete(bonusCards, 0, i)
+			// fmt.Println("after", bonusCards)
+			return bonusCards
+		}
+	}
 
-	m := c.GetMatchCount()
+	return bonusCards
+}
+
+func part1Score(m int) int {
+
 	if m == 0 {
 		return 0
 	}
