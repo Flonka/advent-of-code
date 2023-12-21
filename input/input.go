@@ -18,6 +18,8 @@ func OpenFile(fileName string) io.ReadCloser {
 	return f
 }
 
+// OpenFileBuffered returns a bufio.Scanner of the file path given.
+// Default scanner is used, splitting input on lines.
 func OpenFileBuffered(fileName string) *bufio.Scanner {
 	f, err := os.Open(fileName)
 	if err != nil {
