@@ -80,6 +80,7 @@ func main() {
 
 		// Add bonuscards
 		for i := 1; i <= matches; i++ {
+			// add as many cards for future as current per match
 			cardCount[idx+i] += cardCount[idx]
 		}
 
