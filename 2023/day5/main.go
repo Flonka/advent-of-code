@@ -58,12 +58,32 @@ func main() {
 	slices.Sort(locs)
 	fmt.Println("Part1", locs[0])
 
+	part2(seeds, rangeMaps)
+
+}
+
+func part2(seeds []int, maps []RangeMap) {
+
+	minLoc := -1
+
+	for i := 0; i < len(seeds)-1; i += 2 {
+		start := seeds[i]
+		end := start + seeds[i+1]
+		for j := start; j <= end; j++ {
+			loc := FindLocation(j, maps)
+			if loc < minLoc {
+				minLoc = loc
+			}
+		}
+	}
+
+	fmt.Println("Part2", minLoc)
 }
 
 func FindLocation(seed int, maps []RangeMap) int {
 
+	fmt.Println("seed", seed)
 	// Go through maps in order to find the location
-
 	for i := 0; i < len(maps); i++ {
 		m := maps[i]
 		seed = SeedTranslation(seed, m)
