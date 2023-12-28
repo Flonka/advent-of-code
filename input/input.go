@@ -76,3 +76,18 @@ func ReadCommaSeparatedInts(fiePath string) []int {
 
 	return data
 }
+
+func StringsToInts(s []string) []int {
+
+	ints := make([]int, len(s))
+
+	for i := 0; i < len(s); i++ {
+		n, err := strconv.Atoi(s[i])
+		if err != nil {
+			log.Fatal(err)
+
+		}
+		ints[i] = n
+	}
+	return ints
+}
