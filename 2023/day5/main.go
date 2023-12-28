@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -36,7 +37,6 @@ func main() {
 
 		newMap := strings.Contains(line, "map:")
 		if newMap {
-			fmt.Println("line", line)
 			m := RangeMap{
 				Entries: make([]RangeEntry, 0),
 			}
@@ -50,8 +50,42 @@ func main() {
 
 	}
 
-	fmt.Println(len(rangeMaps))
-	fmt.Println(seeds)
+	locs := []int{}
+	for _, seed := range seeds {
+		locs = append(locs, FindLocation(seed, rangeMaps))
+	}
+
+	slices.Sort(locs)
+	fmt.Println("Part1", locs[0])
+
+}
+
+func FindLocation(seed int, maps []RangeMap) int {
+
+	// Go through maps in order to find the location
+
+	for i := 0; i < len(maps); i++ {
+		m := maps[i]
+		seed = SeedTranslation(seed, m)
+		// fmt.Println("map", i+1, "seed", seed)
+	}
+
+	return seed
+}
+
+func SeedTranslation(seed int, m RangeMap) int {
+	for j := 0; j < len(m.Entries); j++ {
+		e := m.Entries[j]
+
+		// Find if seed is contained between the entry's source and destination range
+		if seed >= e.Source && seed <= e.Source+e.Range {
+			// fmt.Println("seed found", j)
+			diff := e.Destination - e.Source
+			return seed + diff
+		}
+	}
+	// Defaults to original value
+	return seed
 }
 
 func GetEntry(line string) RangeEntry {
