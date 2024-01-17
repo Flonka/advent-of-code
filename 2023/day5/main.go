@@ -58,7 +58,7 @@ func main() {
 	slices.Sort(locs)
 	fmt.Println("Part1", locs[0])
 
-	part2(seeds, rangeMaps)
+	// part2(seeds, rangeMaps)
 
 }
 
