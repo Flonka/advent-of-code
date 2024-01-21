@@ -26,6 +26,10 @@ func main() {
 	}
 
 	fmt.Println("p1", r1)
+
+	// part2
+	fmt.Println("p2", bruteForcePart1(40828492, 233101111101487))
+
 }
 
 // Return number of ways to beat record distance
