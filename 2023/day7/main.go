@@ -55,23 +55,24 @@ func (h *Hand) EvaluateHand() {
 	if highest == ThreeOfAKind {
 		// check for fullhouse
 		for i := 0; i < handSize; i++ {
+			// If one pair is found on some position, it must be a full house.
 			if cardEval[i] == OnePair {
 				h.Type = FullHouse
+				return
 			}
 		}
 	}
 
 	if highest == OnePair {
 		// Check for two pairs
-
 		pairCount := 0
 		for i := 0; i < handSize; i++ {
-			// four one pairs, means two pair
 			if cardEval[i] == OnePair {
 				pairCount++
 			}
 		}
 
+		// four one pairs, means two pair
 		if pairCount == 4 {
 			h.Type = TwoPair
 		}
