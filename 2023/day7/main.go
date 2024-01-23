@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -129,13 +130,37 @@ func main() {
 	for s.Scan() {
 		l := s.Text()
 		hands = append(hands, HandFromLine(l))
-		return
 	}
 
 	// Sort all hands on the type and special rule of even , first high card.
 	// Iterate and calculate the rank ( i * hand.Bid )
 
-	fmt.Println(hands[:3])
+	sort.SliceStable(hands, func(i, j int) bool {
+
+		a := hands[i]
+		b := hands[j]
+
+		if a.Type == b.Type {
+			// loop cards
+			for c := 0; c < handSize; c++ {
+
+				if a.Cards[c] == b.Cards[c] {
+					continue
+				}
+				return a.Cards[c] < b.Cards[c]
+			}
+		}
+
+		return a.Type < b.Type
+	})
+
+	p1 := 0
+	for i, h := range hands {
+		p1 += (i + 1) * h.Bid
+
+	}
+
+	fmt.Println("part1", p1)
 
 }
 
