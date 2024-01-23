@@ -44,9 +44,6 @@ func (h *Hand) EvaluateHand() {
 		}
 	}
 
-	fmt.Println("cards", h.Cards)
-	fmt.Println("eval", cardEval)
-
 	// Start by setting handtype to highest found
 	h.Type = highest
 
@@ -67,8 +64,16 @@ func (h *Hand) EvaluateHand() {
 	if highest == OnePair {
 		// Check for two pairs
 
+		pairCount := 0
 		for i := 0; i < handSize; i++ {
 			// four one pairs, means two pair
+			if cardEval[i] == OnePair {
+				pairCount++
+			}
+		}
+
+		if pairCount == 4 {
+			h.Type = TwoPair
 		}
 	}
 
