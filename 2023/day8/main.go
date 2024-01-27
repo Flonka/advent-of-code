@@ -15,17 +15,59 @@ func main() {
 	s.Scan()
 	instructions := toInts(s.Text())
 
-	// Convert inputLine to ints
 	m := readNodeMap(s)
 
+	fmt.Println("Part1", part1(m, instructions))
+	fmt.Println("Part2", part2(m, instructions))
+}
+
+func part2(m map[string][2]string, instructions []int) int {
+
+	// Find all starting ids
+	ids := make([]string, 0)
+
+	for k := range m {
+		if k[2] == 'A' {
+			ids = append(ids, k)
+		}
+	}
+
+	count := 0
+
+mainLoop:
+	for {
+		for i := 0; i < len(ids); i++ {
+			ids[i] = runInstructions(ids[i], m, instructions)
+		}
+		count++
+
+		for i := 0; i < len(ids); i++ {
+			if ids[i][2] != 'Z' {
+				continue mainLoop
+			}
+		}
+		break
+	}
+
+	fmt.Println(ids, count)
+	return count * len(instructions)
+}
+
+func runInstructions(id string, m map[string][2]string, instructions []int) string {
+	for i := 0; i < len(instructions); i++ {
+		id = m[id][instructions[i]]
+	}
+
+	return id
+}
+
+func part1(m map[string][2]string, instructions []int) int {
 	// Run instructions until return ZZZ
 	count := 0
 	// Start at AAA
 	id := "AAA"
 	for {
-		for i := 0; i < len(instructions); i++ {
-			id = m[id][instructions[i]]
-		}
+		id = runInstructions(id, m, instructions)
 		count++
 
 		if id == "ZZZ" {
@@ -33,8 +75,7 @@ func main() {
 		}
 	}
 
-	fmt.Println("Part1", count*len(instructions))
-
+	return count * len(instructions)
 }
 
 func toInts(s string) []int {
