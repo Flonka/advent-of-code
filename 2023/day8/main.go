@@ -17,8 +17,6 @@ func main() {
 
 	// Convert inputLine to ints
 	m := readNodeMap(s)
-	// fmt.Println(m)
-	// fmt.Println(instructions)
 
 	// Run instructions until return ZZZ
 	count := 0
@@ -35,7 +33,7 @@ func main() {
 		}
 	}
 
-	fmt.Println("Part1", count)
+	fmt.Println("Part1", count*len(instructions))
 
 }
 
