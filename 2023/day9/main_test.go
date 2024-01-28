@@ -17,7 +17,7 @@ func TestPart1(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		result := part1(test.input)
+		result := part1(test.input, true)
 		if result != test.output {
 			t.Error(result, " is not ", test.output)
 		}
@@ -33,4 +33,14 @@ func TestDiffSlice(t *testing.T) {
 		t.Fail()
 	}
 
+}
+
+func TestPart2Prepend(t *testing.T) {
+
+	a := []int{10, 13, 16, 21, 30, 45}
+
+	r := part1(a, false)
+	if r != 5 {
+		t.Error("result is not 5", r)
+	}
 }
