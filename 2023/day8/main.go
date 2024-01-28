@@ -3,9 +3,12 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"os"
+	"slices"
 	"strings"
 
 	"github.com/Flonka/advent-of-code/input"
+	"github.com/Flonka/advent-of-code/mathutils"
 )
 
 func main() {
@@ -21,8 +24,61 @@ func main() {
 	fmt.Println("Part2", part2(m, instructions))
 }
 
-func part2(m map[string][2]string, instructions []int) int {
+func part2(m map[string][2]string, ins []int) int {
 
+	startIds := part2Starts(m, ins)
+	if !verifyCycling(startIds, m, ins) {
+		fmt.Println("Aint no cycling")
+		os.Exit(1)
+	}
+
+	// Cycling with consequent loop iterations, the LCM method will work.
+
+	// Get all iterations
+	cs := make([]int, 0, len(startIds))
+	for i := 0; i < len(startIds); i++ {
+		_, c := findGoal(startIds[i], m, ins)
+		cs = append(cs, c)
+	}
+
+	lcm := mathutils.LCM(cs[0], cs[1], cs[2:]...)
+
+	return lcm * len(ins)
+}
+
+func verifyCycling(starts []string, m map[string][2]string, instructions []int) bool {
+
+	// need to be producing the same iterations between finding the goal
+	// as well as identifying looping (start == end)
+	// Look for cycles
+	for i := 0; i < len(starts); i++ {
+
+		id := starts[i]
+		counts := make([]int, 0)
+		for {
+			startId := id
+			var c int
+			fmt.Println("start", id)
+			id, c = findGoal(id, m, instructions)
+			counts = append(counts, c)
+
+			if startId == id {
+				// Start == end, its looping.
+				// All counts must be the same..
+				counts = slices.Compact(counts)
+				if len(counts) != 1 {
+					return false
+				}
+				break
+			}
+		}
+	}
+
+	return true
+
+}
+
+func part2Starts(m map[string][2]string, instructions []int) []string {
 	// Find all starting ids
 	ids := make([]string, 0)
 
@@ -32,30 +88,29 @@ func part2(m map[string][2]string, instructions []int) int {
 		}
 	}
 
-	count := 0
-
-mainLoop:
-	for {
-		for i := 0; i < len(ids); i++ {
-			ids[i] = runInstructions(ids[i], m, instructions)
-		}
-		count++
-
-		for i := 0; i < len(ids); i++ {
-			if ids[i][2] != 'Z' {
-				continue mainLoop
-			}
-		}
-		break
-	}
-
-	fmt.Println(ids, count)
-	return count * len(instructions)
+	return ids
 }
 
-func runInstructions(id string, m map[string][2]string, instructions []int) string {
-	for i := 0; i < len(instructions); i++ {
-		id = m[id][instructions[i]]
+func findGoal(id string, m map[string][2]string, instructions []int) (string, int) {
+	count := 0
+	for {
+		id = runInstructions(id, 1, m, instructions)
+		count++
+
+		if id[2] == 'Z' {
+			break
+		}
+
+	}
+	return id, count
+}
+
+func runInstructions(id string, times int, m map[string][2]string, instructions []int) string {
+	for x := 0; x < times; x++ {
+		for i := 0; i < len(instructions); i++ {
+			id = m[id][instructions[i]]
+		}
+
 	}
 
 	return id
@@ -67,7 +122,7 @@ func part1(m map[string][2]string, instructions []int) int {
 	// Start at AAA
 	id := "AAA"
 	for {
-		id = runInstructions(id, m, instructions)
+		id = runInstructions(id, 1, m, instructions)
 		count++
 
 		if id == "ZZZ" {
