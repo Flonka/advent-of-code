@@ -6,6 +6,23 @@ type DiscreteMap2D struct {
 	Data   [][]int
 }
 
+func (d *DiscreteMap2D) SetValue(dim int, pos DiscretePos2D, value int) {
+	d.Data[dim][d.GetDataIndex(pos)] = value
+}
+
+func (d *DiscreteMap2D) GetValue(dim int, pos DiscretePos2D) int {
+	return d.Data[dim][d.GetDataIndex(pos)]
+}
+
+func (d *DiscreteMap2D) GetDataIndex(pos DiscretePos2D) int {
+	return pos.Y*d.Width + pos.X
+}
+
+type DiscretePos2D struct {
+	X int
+	Y int
+}
+
 // NewDiscreteMap2D creates a new DiscreteMap2D with given width, height and dimension
 func NewDiscreteMap2D(width, height, dimension int) DiscreteMap2D {
 
@@ -22,15 +39,16 @@ func NewDiscreteMap2D(width, height, dimension int) DiscreteMap2D {
 	}
 }
 
-func (d *DiscreteMap2D) SetValue(dim int, pos DiscretePos2D, value int) {
-	d.Data[dim][d.GetDataIndex(pos)] = value
-}
+// GetBorderPositions returns the four bordering neighbour positions
+// in order:
+// x+1, x-1, y+1, y-1
+func GetBorderPositions(pos DiscretePos2D) []DiscretePos2D {
 
-func (d *DiscreteMap2D) GetDataIndex(pos DiscretePos2D) int {
-	return pos.Y*d.Width + pos.X
-}
+	return []DiscretePos2D{
+		{X: pos.X + 1, Y: pos.Y},
+		{X: pos.X - 1, Y: pos.Y},
+		{X: pos.X, Y: pos.Y + 1},
+		{X: pos.X, Y: pos.Y - 1},
+	}
 
-type DiscretePos2D struct {
-	X int
-	Y int
 }

@@ -24,6 +24,10 @@ const (
 	Unknown
 )
 
+func (p Pipe) String() string {
+	return [...]string{"NS", "EW", "NE", "NW", "SW", "SE", "Ground", "Start", "Unknown"}[p]
+}
+
 const (
 	PipeValues = iota
 	DistanceValues
@@ -63,10 +67,46 @@ func main() {
 	}
 
 	fmt.Println("start:", startPos)
+	findConnectedPipes(startPos, pipeMap)
 
 	// Figure out where S connects toward. based on surrounding pipes
 	// Go through map, starting at start , tracing positions, until reaching start again. Find position furthest
 	// fmt.Println(pipeMap)
+}
+
+func findConnectedPipes(pos spatial.DiscretePos2D, dmap spatial.DiscreteMap2D) []spatial.DiscretePos2D {
+
+	connected := make([]spatial.DiscretePos2D, 0, 4)
+	n := spatial.GetBorderPositions(pos)
+
+	// x+1
+	p := n[0]
+	if inbounds(p, dmap) {
+		pv := Pipe(dmap.GetValue(PipeValues, p))
+		switch pv {
+
+		case NorthWest, EastWest, SouthWest:
+			connected = append(connected, p)
+
+		}
+	}
+	// x-1
+
+	// y+1
+
+	// y-1
+	return connected
+}
+
+func inbounds(p spatial.DiscretePos2D, dmap spatial.DiscreteMap2D) bool {
+
+	if p.X < 0 || p.X > dmap.Width {
+		return false
+	}
+	if p.Y < 0 || p.Y > dmap.Height {
+		return false
+	}
+	return true
 }
 
 func parseLineToPipes(line string) []Pipe {
