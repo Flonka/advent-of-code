@@ -6,11 +6,12 @@ type DiscreteMap2D struct {
 	Data   [][]int
 }
 
-func NewDiscreteMap2D(width, height, dim int) DiscreteMap2D {
+// NewDiscreteMap2D creates a new DiscreteMap2D with given width, height and dimension
+func NewDiscreteMap2D(width, height, dimension int) DiscreteMap2D {
 
-	d := make([][]int, dim)
+	d := make([][]int, dimension)
 
-	for i := 0; i < dim; i++ {
+	for i := 0; i < dimension; i++ {
 		d[i] = make([]int, width*height)
 	}
 
