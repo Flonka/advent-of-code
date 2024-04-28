@@ -79,13 +79,14 @@ func main() {
 	}
 
 	fmt.Println("start:", startPos)
-	findConnectedPipes(startPos, pipeMap)
+	startConns := findConnectedPipes(startPos, pipeMap)
+	fmt.Println(startConns)
 
 	// Figure out where S connects toward. based on surrounding pipes
 	// Go through map, starting at start , tracing positions, until reaching start again. Find position furthest
-	// fmt.Println(pipeMap)
 }
 
+// findConnectedPipes returns a slice of positions which have cells connecting to the given position
 func findConnectedPipes(pos spatial.DiscretePos2D, dmap spatial.DiscreteMap2D[Cell]) []spatial.DiscretePos2D {
 
 	connected := make([]spatial.DiscretePos2D, 0, 4)
@@ -93,19 +94,37 @@ func findConnectedPipes(pos spatial.DiscretePos2D, dmap spatial.DiscreteMap2D[Ce
 
 	// x+1
 	p := n[0]
-	if dmap.IsPositionInbounds(p) {
-		c := Cell(dmap.GetValue(CellValues, p))
-
-		if c.HasConnection(West) {
-			connected = append(connected, p)
-		}
+	if isConnected(dmap, p, West) {
+		connected = append(connected, p)
 	}
 	// x-1
-
+	p = n[1]
+	if isConnected(dmap, p, East) {
+		connected = append(connected, p)
+	}
 	// y+1
+	p = n[2]
+	if isConnected(dmap, p, North) {
+		connected = append(connected, p)
+	}
 
 	// y-1
+	p = n[3]
+	if isConnected(dmap, p, South) {
+		connected = append(connected, p)
+	}
 	return connected
+}
+
+func isConnected(dmap spatial.DiscreteMap2D[Cell], p spatial.DiscretePos2D, d Direction) bool {
+
+	if dmap.IsPositionInbounds(p) {
+		c := Cell(dmap.GetValue(CellValues, p))
+		if c.HasConnection(d) {
+			return true
+		}
+	}
+	return false
 }
 
 func parseLine(line string) []Cell {
