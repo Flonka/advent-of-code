@@ -10,26 +10,38 @@ import (
 
 const size = 140
 
-type Pipe int
-
-const (
-	NorthSouth Pipe = iota
-	EastWest
-	NorthEast
-	NorthWest
-	SouthWest
-	SouthEast
-	Ground
-	Start
-	Unknown
-)
-
-func (p Pipe) String() string {
-	return [...]string{"NS", "EW", "NE", "NW", "SW", "SE", "Ground", "Start", "Unknown"}[p]
+// ConnectingCell describes a pipe section, with data on where connections are positioned.
+type Cell struct {
+	connections [2]Direction
+	textValue   rune
 }
 
+// HasConenction returns true if cell contains a connection to direction
+func (c Cell) HasConnection(d Direction) bool {
+	return c.connections[0] == d || c.connections[1] == d
+}
+
+func NewCell(r rune, c1 Direction, c2 Direction) Cell {
+	c := Cell{}
+	c.textValue = r
+	c.connections[0] = c1
+	c.connections[1] = c2
+	return c
+}
+
+type Direction int
+
 const (
-	PipeValues = iota
+	// Zero value for Direction (integer) is the first line
+	Unitialized Direction = iota
+	North
+	East
+	South
+	West
+)
+
+const (
+	CellValues = iota
 	DistanceValues
 )
 
@@ -37,7 +49,7 @@ func main() {
 
 	s := input.OpenFileBuffered("input.txt")
 
-	pipeMap := spatial.NewDiscreteMap2D(size, size, 1)
+	pipeMap := spatial.NewDiscreteMap2D[Cell](size, size, 1)
 
 	y := 0
 	startPos := spatial.DiscretePos2D{}
@@ -46,21 +58,21 @@ func main() {
 		// Read all lines, create map
 		// Find starting pos
 		l := s.Text()
-		pipes := parseLineToPipes(l)
+		cells := parseLine(l)
 
 		// Assert correct size...
-		if len(pipes) != size {
+		if len(cells) != size {
 			os.Exit(1)
 		}
 
 		pos.Y = y
 		for x := 0; x < size; x++ {
 			pos.X = x
-			p := pipes[x]
-			if p == Start {
+			c := cells[x]
+			if c.textValue == 'S' {
 				startPos = pos
 			}
-			pipeMap.SetValue(PipeValues, pos, int(p))
+			pipeMap.SetValue(CellValues, pos, c)
 		}
 
 		y++
@@ -74,20 +86,18 @@ func main() {
 	// fmt.Println(pipeMap)
 }
 
-func findConnectedPipes(pos spatial.DiscretePos2D, dmap spatial.DiscreteMap2D) []spatial.DiscretePos2D {
+func findConnectedPipes(pos spatial.DiscretePos2D, dmap spatial.DiscreteMap2D[Cell]) []spatial.DiscretePos2D {
 
 	connected := make([]spatial.DiscretePos2D, 0, 4)
 	n := spatial.GetBorderPositions(pos)
 
 	// x+1
 	p := n[0]
-	if inbounds(p, dmap) {
-		pv := Pipe(dmap.GetValue(PipeValues, p))
-		switch pv {
+	if dmap.IsPositionInbounds(p) {
+		c := Cell(dmap.GetValue(CellValues, p))
 
-		case NorthWest, EastWest, SouthWest:
+		if c.HasConnection(West) {
 			connected = append(connected, p)
-
 		}
 	}
 	// x-1
@@ -98,53 +108,36 @@ func findConnectedPipes(pos spatial.DiscretePos2D, dmap spatial.DiscreteMap2D) [
 	return connected
 }
 
-func inbounds(p spatial.DiscretePos2D, dmap spatial.DiscreteMap2D) bool {
+func parseLine(line string) []Cell {
 
-	if p.X < 0 || p.X > dmap.Width {
-		return false
-	}
-	if p.Y < 0 || p.Y > dmap.Height {
-		return false
-	}
-	return true
-}
-
-func parseLineToPipes(line string) []Pipe {
-
-	pipes := make([]Pipe, 0, len(line))
+	cells := make([]Cell, 0, len(line))
 
 	for _, r := range line {
 
-		p := pipeFromRune(r)
-		if p == Unknown {
-			os.Exit(1)
-		}
-		pipes = append(pipes, p)
+		c := cellFromRune(r)
+		cells = append(cells, c)
 
 	}
 
-	return pipes
+	return cells
 }
 
-func pipeFromRune(r rune) Pipe {
+func cellFromRune(r rune) Cell {
 	switch r {
 	case '|':
-		return NorthSouth
+		return NewCell(r, North, South)
 	case '-':
-		return EastWest
+		return NewCell(r, West, East)
 	case 'L':
-		return NorthEast
+		return NewCell(r, North, East)
 	case 'J':
-		return NorthWest
+		return NewCell(r, West, North)
 	case '7':
-		return SouthWest
+		return NewCell(r, West, South)
 	case 'F':
-		return SouthEast
-	case '.':
-		return Ground
-	case 'S':
-		return Start
+		return NewCell(r, South, East)
 	default:
-		return Unknown
+		return Cell{textValue: r}
 	}
+
 }

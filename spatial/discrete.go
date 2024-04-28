@@ -1,21 +1,34 @@
 package spatial
 
-type DiscreteMap2D struct {
+type DiscreteMap2D[T any] struct {
 	Width  int
 	Height int
-	Data   [][]int
+	Data   [][]T
 }
 
-func (d *DiscreteMap2D) SetValue(dim int, pos DiscretePos2D, value int) {
+// SetValue sets a value of a position in the dimension
+func (d *DiscreteMap2D[T]) SetValue(dim int, pos DiscretePos2D, value T) {
 	d.Data[dim][d.GetDataIndex(pos)] = value
 }
 
-func (d *DiscreteMap2D) GetValue(dim int, pos DiscretePos2D) int {
+// Get the value of position in dimension
+func (d *DiscreteMap2D[T]) GetValue(dim int, pos DiscretePos2D) T {
 	return d.Data[dim][d.GetDataIndex(pos)]
 }
 
-func (d *DiscreteMap2D) GetDataIndex(pos DiscretePos2D) int {
+func (d *DiscreteMap2D[T]) GetDataIndex(pos DiscretePos2D) int {
 	return pos.Y*d.Width + pos.X
+}
+
+func (d *DiscreteMap2D[T]) IsPositionInbounds(p DiscretePos2D) bool {
+
+	if p.X < 0 || p.X > d.Width {
+		return false
+	}
+	if p.Y < 0 || p.Y > d.Height {
+		return false
+	}
+	return true
 }
 
 type DiscretePos2D struct {
@@ -24,15 +37,15 @@ type DiscretePos2D struct {
 }
 
 // NewDiscreteMap2D creates a new DiscreteMap2D with given width, height and dimension
-func NewDiscreteMap2D(width, height, dimension int) DiscreteMap2D {
+func NewDiscreteMap2D[T any](width, height, dimension int) DiscreteMap2D[T] {
 
-	d := make([][]int, dimension)
+	d := make([][]T, dimension)
 
 	for i := 0; i < dimension; i++ {
-		d[i] = make([]int, width*height)
+		d[i] = make([]T, width*height)
 	}
 
-	return DiscreteMap2D{
+	return DiscreteMap2D[T]{
 		Width:  width,
 		Height: height,
 		Data:   d,
