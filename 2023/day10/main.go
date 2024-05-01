@@ -18,7 +18,19 @@ type Cell struct {
 
 // HasConenction returns true if cell contains a connection to direction
 func (c Cell) HasConnection(d Direction) bool {
+	// S type cell connects to every direction
+	if c.textValue == 'S' {
+		return true
+	}
 	return c.connections[0] == d || c.connections[1] == d
+}
+
+func (c Cell) GetConnectingPositions() []spatial.DiscretePos2D {
+
+	p1 := c.connections[0].ToPosition()
+	p2 := c.connections[1].ToPosition()
+	return []spatial.DiscretePos2D{p1, p2}
+
 }
 
 func NewCell(r rune, c1 Direction, c2 Direction) Cell {
@@ -30,6 +42,21 @@ func NewCell(r rune, c1 Direction, c2 Direction) Cell {
 }
 
 type Direction int
+
+func (d Direction) ToPosition() spatial.DiscretePos2D {
+	switch d {
+	case North:
+		return spatial.DiscretePos2D{X: 0, Y: -1}
+	case South:
+		return spatial.DiscretePos2D{X: 0, Y: 1}
+	case East:
+		return spatial.DiscretePos2D{X: 1, Y: 0}
+	case West:
+		return spatial.DiscretePos2D{X: -1, Y: 0}
+	default:
+		panic("not implemented")
+	}
+}
 
 const (
 	// Zero value for Direction (integer) is the first line
@@ -49,7 +76,7 @@ func main() {
 
 	s := input.OpenFileBuffered("input.txt")
 
-	pipeMap := spatial.NewDiscreteMap2D[Cell](size, size, 1)
+	maze := spatial.NewDiscreteMap2D[Cell](size, size, 1)
 
 	y := 0
 	startPos := spatial.DiscretePos2D{}
@@ -72,18 +99,60 @@ func main() {
 			if c.textValue == 'S' {
 				startPos = pos
 			}
-			pipeMap.SetValue(CellValues, pos, c)
+			maze.SetValue(CellValues, pos, c)
 		}
 
 		y++
 	}
 
 	fmt.Println("start:", startPos)
-	startConns := findConnectedPipes(startPos, pipeMap)
-	fmt.Println(startConns)
 
+	// Pick one to start from, go until we reach start pos
+	traverseLoop(maze, startPos)
+
+}
+
+func traverseLoop(maze spatial.DiscreteMap2D[Cell], start spatial.DiscretePos2D) {
 	// Figure out where S connects toward. based on surrounding pipes
-	// Go through map, starting at start , tracing positions, until reaching start again. Find position furthest
+	startConns := findConnectedPipes(start, maze)
+
+	stepCount := 0
+
+	// Pick one path to start going
+	pos := startConns[0]
+	lastPos := start
+	for {
+
+		fmt.Println("Current pos", pos)
+		cell := maze.GetValue(CellValues, pos)
+		next := stepFurther(cell, pos, lastPos)
+		lastPos = pos
+		pos = next
+		stepCount++
+		fmt.Println(stepCount)
+		// Return if we have reached start
+		if pos == start {
+			fmt.Println("Found start again", pos, start)
+			break
+		}
+	}
+
+	fmt.Println("steps", stepCount)
+}
+
+// Return next pos
+func stepFurther(cell Cell, pos spatial.DiscretePos2D, last spatial.DiscretePos2D) spatial.DiscretePos2D {
+
+	// Get connecting positions from cell, return next one not being the last one.
+	for _, p := range cell.GetConnectingPositions() {
+		px := pos.Add(p)
+		if px != last {
+			return px
+		}
+	}
+
+	panic("not found new pos")
+
 }
 
 // findConnectedPipes returns a slice of positions which have cells connecting to the given position

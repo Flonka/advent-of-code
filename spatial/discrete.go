@@ -36,6 +36,13 @@ type DiscretePos2D struct {
 	Y int
 }
 
+func (p DiscretePos2D) Add(p2 DiscretePos2D) DiscretePos2D {
+	return DiscretePos2D{
+		X: p.X + p2.X,
+		Y: p.Y + p2.Y,
+	}
+}
+
 // NewDiscreteMap2D creates a new DiscreteMap2D with given width, height and dimension
 func NewDiscreteMap2D[T any](width, height, dimension int) DiscreteMap2D[T] {
 
