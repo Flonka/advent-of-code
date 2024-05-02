@@ -123,21 +123,21 @@ func traverseLoop(maze spatial.DiscreteMap2D[Cell], start spatial.DiscretePos2D)
 	lastPos := start
 	for {
 
-		fmt.Println("Current pos", pos)
 		cell := maze.GetValue(CellValues, pos)
 		next := stepFurther(cell, pos, lastPos)
 		lastPos = pos
 		pos = next
 		stepCount++
-		fmt.Println(stepCount)
 		// Return if we have reached start
 		if pos == start {
-			fmt.Println("Found start again", pos, start)
+			fmt.Println("Found start again")
 			break
 		}
 	}
 
 	fmt.Println("steps", stepCount)
+
+	fmt.Println("p1", stepCount/2+1)
 }
 
 // Return next pos
