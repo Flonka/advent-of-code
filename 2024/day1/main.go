@@ -54,6 +54,29 @@ func main() {
 		distance += d
 	}
 
-	fmt.Println("Part1 , total distance:", distance)
+	fmt.Println("Part1, total distance:", distance)
 
+	var similarity int
+
+	for _, n := range locations[0] {
+		similarity += n * findN(n, locations[1])
+	}
+
+	fmt.Println("Part2, similarity:", similarity)
+}
+
+// findN returns count of n in list, assuming list is sorted
+func findN(n int, list []int) int {
+	var c int
+	for _, i := range list {
+		if i == n {
+			c++
+		}
+		// early exit due to sorted input list
+		if i > n {
+			return c
+		}
+	}
+
+	return c
 }
