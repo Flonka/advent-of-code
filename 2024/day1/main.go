@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/Flonka/advent-of-code/input"
+	"github.com/Flonka/advent-of-code/mathutils"
 )
 
 func main() {
@@ -46,10 +47,7 @@ func main() {
 		i2 := locations[1][i]
 
 		d := i2 - i1
-
-		if d < 0 {
-			d = -d
-		}
+		d = mathutils.AbsInt(d)
 
 		distance += d
 	}

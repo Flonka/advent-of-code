@@ -21,3 +21,10 @@ func LCM(a, b int, integers ...int) int {
 
 	return result
 }
+
+func AbsInt(n int) int {
+	if n < 0 {
+		return -n
+	}
+	return n
+}
