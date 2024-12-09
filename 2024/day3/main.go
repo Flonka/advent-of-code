@@ -14,6 +14,7 @@ func main() {
 	d := Day3{lines: input.ReadLinesInFile("input.txt")}
 
 	d.part1()
+	d.part2()
 }
 
 type Day3 struct {
@@ -37,6 +38,57 @@ func (d *Day3) part1() {
 	}
 
 	fmt.Println("Part1 ", sum)
+}
+
+func (d *Day3) part2() {
+
+	// Starts off enabled
+	enabled := true
+	mults := make([]multPair, 0, 100)
+	for _, l := range d.lines {
+		// read mults from enabled chunk
+		mults = append(mults, readMults(l)...)
+	}
+
+	var sum int
+	for _, m := range mults {
+		sum += m.a * m.b
+
+	}
+
+	fmt.Println("Part2 ", sum)
+}
+
+func filterEnabled(in string, enabled bool) []string {
+
+	filtered := make([]string, 0, 10)
+	do := "do()"
+	dont := "don't()"
+
+	currentIdx := 0
+
+	for {
+		if enabled {
+			idx := strings.Index(in[currentIdx:], dont)
+			if idx == -1 {
+				break
+			}
+			filtered = append(filtered, in[currentIdx:idx-1])
+			currentIdx = idx + len(dont)
+			enabled = false
+		} else {
+			idx := strings.Index(in[currentIdx:], do)
+			if idx == -1 {
+				break
+			}
+
+			filtered = append(filtered, in[currentIdx:idx-1])
+			currentIdx = idx + len(do)
+			enabled = true
+		}
+	}
+
+	return filtered
 }
 
 type multPair struct {
