@@ -47,7 +47,11 @@ func (d *Day3) part2() {
 	mults := make([]multPair, 0, 100)
 	for _, l := range d.lines {
 		// read mults from enabled chunk
-		mults = append(mults, readMults(l)...)
+		enabledStrings, ne := filterEnabled(l, enabled)
+		enabled = ne
+		for _, s := range enabledStrings {
+			mults = append(mults, readMults(s)...)
+		}
 	}
 
 	var sum int
@@ -59,7 +63,9 @@ func (d *Day3) part2() {
 	fmt.Println("Part2 ", sum)
 }
 
-func filterEnabled(in string, enabled bool) []string {
+// filterEnabled parses input string and returns only enabled parts of the string.
+// returns the filtered string and what the enabled status is.
+func filterEnabled(in string, enabled bool) ([]string, bool) {
 
 	filtered := make([]string, 0, 10)
 	do := "do()"
@@ -69,6 +75,7 @@ func filterEnabled(in string, enabled bool) []string {
 
 	for {
 		if enabled {
+			// Find next disabling and add string until it
 			idx := strings.Index(in[currentIdx:], dont)
 			if idx == -1 {
 				break
@@ -77,6 +84,7 @@ func filterEnabled(in string, enabled bool) []string {
 			currentIdx = idx + len(dont)
 			enabled = false
 		} else {
+			// Find next enabling and update current index to it
 			idx := strings.Index(in[currentIdx:], do)
 			if idx == -1 {
 				break
@@ -88,7 +96,7 @@ func filterEnabled(in string, enabled bool) []string {
 		}
 	}
 
-	return filtered
+	return filtered, enabled
 }
 
 type multPair struct {
