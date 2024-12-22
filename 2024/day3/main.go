@@ -78,20 +78,24 @@ func filterEnabled(in string, enabled bool) ([]string, bool) {
 			// Find next disabling and add string until it
 			idx := strings.Index(in[currentIdx:], dont)
 			if idx == -1 {
+				// If no dont is found, add the rest
+				filtered = append(filtered, in[currentIdx:])
 				break
 			}
-			filtered = append(filtered, in[currentIdx:idx-1])
-			currentIdx = idx + len(dont)
+
+			// set end to include whole dont
+			endIdx := currentIdx + idx + len(dont) - 1
+			filtered = append(filtered, in[currentIdx:endIdx])
+			currentIdx += idx + len(dont) - 1
 			enabled = false
 		} else {
 			// Find next enabling and update current index to it
 			idx := strings.Index(in[currentIdx:], do)
 			if idx == -1 {
+				fmt.Println("no do found in:", in[currentIdx:])
 				break
 			}
-
-			filtered = append(filtered, in[currentIdx:idx-1])
-			currentIdx = idx + len(do)
+			currentIdx += idx + len(do) - 1
 			enabled = true
 		}
 	}
