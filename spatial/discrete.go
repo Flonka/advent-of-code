@@ -36,6 +36,16 @@ type DiscretePos2D struct {
 	Y int
 }
 
+var N = DiscretePos2D{0, 1}
+var NE = DiscretePos2D{1, 1}
+var E = DiscretePos2D{1, 0}
+var SE = DiscretePos2D{1, 1}
+var S = DiscretePos2D{0, -1}
+var SW = DiscretePos2D{-1, -1}
+var W = DiscretePos2D{-1, 0}
+var NW = DiscretePos2D{-1, 1}
+
+// Add returns the added result as a new position
 func (p DiscretePos2D) Add(p2 DiscretePos2D) DiscretePos2D {
 	return DiscretePos2D{
 		X: p.X + p2.X,
@@ -62,13 +72,13 @@ func NewDiscreteMap2D[T any](width, height, dimension int) DiscreteMap2D[T] {
 // GetBorderPositions returns the four bordering neighbour positions
 // in order:
 // x+1, x-1, y+1, y-1
+// East, West, North, South
 func GetBorderPositions(pos DiscretePos2D) []DiscretePos2D {
 
 	return []DiscretePos2D{
-		{X: pos.X + 1, Y: pos.Y},
-		{X: pos.X - 1, Y: pos.Y},
-		{X: pos.X, Y: pos.Y + 1},
-		{X: pos.X, Y: pos.Y - 1},
+		pos.Add(E),
+		pos.Add(W),
+		pos.Add(N),
+		pos.Add(S),
 	}
-
 }
