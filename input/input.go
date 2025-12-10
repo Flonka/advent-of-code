@@ -41,29 +41,30 @@ func ReadLinesInFile(fileName string) []string {
 	return outputLines
 }
 
+// splitComma is a bufio.SplitFunc, for splitting values on comma signs.
+func splitComma(data []byte, atEOF bool) (advance int, token []byte, err error) {
+	commaIndex := bytes.IndexByte(data, ',')
+	newLineIndex := bytes.IndexByte(data, '\n')
+	if atEOF {
+		return len(data), nil, nil
+	}
+	i := commaIndex
+
+	if commaIndex == -1 && newLineIndex != -1 {
+		i = newLineIndex
+	}
+
+	return i + 1, data[:i], nil
+}
+
 // ReadCommaSeparatedInts assumes the first line in a file has all the integers comma separated
-func ReadCommaSeparatedInts(fiePath string) []int {
-	r := OpenFile(fiePath)
+func ReadCommaSeparatedInts(filePath string) []int {
+	r := OpenFile(filePath)
 	defer r.Close()
 
 	s := bufio.NewScanner(r)
 
-	s.Split(func(data []byte, atEOF bool) (advance int, token []byte, err error) {
-
-		commaIndex := bytes.IndexByte(data, ',')
-		newLineIndex := bytes.IndexByte(data, '\n')
-		if atEOF {
-			return len(data), nil, nil
-		}
-		i := commaIndex
-
-		if commaIndex == -1 && newLineIndex != -1 {
-			i = newLineIndex
-		}
-
-		return i + 1, data[:i], nil
-
-	})
+	s.Split(splitComma)
 
 	var data []int
 	for s.Scan() {
@@ -77,15 +78,29 @@ func ReadCommaSeparatedInts(fiePath string) []int {
 	return data
 }
 
-func StringsToInts(s []string) []int {
+func ReadCommaSeparated[T ~string](filePath string) []T {
+	r := OpenFile(filePath)
+	defer r.Close()
 
+	s := bufio.NewScanner(r)
+
+	s.Split(splitComma)
+
+	var data []T
+	for s.Scan() {
+		data = append(data, T(s.Text()))
+	}
+
+	return data
+}
+
+func StringsToInts(s []string) []int {
 	ints := make([]int, len(s))
 
 	for i := 0; i < len(s); i++ {
 		n, err := strconv.Atoi(s[i])
 		if err != nil {
 			log.Fatal(err)
-
 		}
 		ints[i] = n
 	}
