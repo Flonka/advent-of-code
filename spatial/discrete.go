@@ -1,6 +1,8 @@
 // Package spatial contain types about accessing and storing spatial data.
 package spatial
 
+// DiscreteMap2D can be used for storing 2d data with multiple dimensions in
+// a integer coordinate system.
 type DiscreteMap2D[T any] struct {
 	Width  int
 	Height int
@@ -12,11 +14,14 @@ func (d *DiscreteMap2D[T]) SetValue(dim int, pos DiscretePos2D, value T) {
 	d.Data[dim][d.GetDataIndex(pos)] = value
 }
 
-// GetValue the value of position in dimension
+// GetValue the value of position in dimension.
+// The positions x is width, y is height.
 func (d *DiscreteMap2D[T]) GetValue(dim int, pos DiscretePos2D) T {
 	return d.Data[dim][d.GetDataIndex(pos)]
 }
 
+// GetDataIndex gets the index to read data in the DiscreteMap2D
+// position x is used for width, y for height
 func (d *DiscreteMap2D[T]) GetDataIndex(pos DiscretePos2D) int {
 	return pos.Y*d.Width + pos.X
 }
@@ -31,6 +36,8 @@ func (d *DiscreteMap2D[T]) IsPositionInbounds(p DiscretePos2D) bool {
 	return true
 }
 
+// DiscretePos2D is used to access values in the DiscreteMap2D.
+// The x values are used for width, y for height.
 type DiscretePos2D struct {
 	X int
 	Y int
@@ -70,6 +77,27 @@ func NewDiscreteMap2D[T any](width, height, dimension int) DiscreteMap2D[T] {
 	}
 }
 
+// NewDiscreteMap2DFromLines creates DiscreteMap2D with width and height from the input lines
+// it is assumed all linesare the same length
+// first dimension is filled from lines in combination with the transformFunc data type.
+func NewDiscreteMap2DFromLines[T any](dimension int, lines []string, transformFunc func(r rune) T) DiscreteMap2D[T] {
+	w := len(lines[0])
+	h := len(lines)
+
+	dmap := NewDiscreteMap2D[T](w, h, dimension)
+	p := DiscretePos2D{}
+
+	for y, l := range lines {
+		p.Y = y
+		for x, r := range l {
+			p.X = x
+			dmap.SetValue(0, p, transformFunc(r))
+		}
+	}
+
+	return dmap
+}
+
 // GetBorderPositions returns the four bordering neighbour positions
 // in order:
 // x+1, x-1, y+1, y-1
@@ -80,5 +108,20 @@ func GetBorderPositions(pos DiscretePos2D) []DiscretePos2D {
 		pos.Add(W),
 		pos.Add(N),
 		pos.Add(S),
+	}
+}
+
+// GetAdjacentPositions returns the adjacent positions.
+// in clockwise order starting from North
+func GetAdjacentPositions(pos DiscretePos2D) []DiscretePos2D {
+	return []DiscretePos2D{
+		pos.Add(N),
+		pos.Add(NE),
+		pos.Add(E),
+		pos.Add(SE),
+		pos.Add(S),
+		pos.Add(SW),
+		pos.Add(W),
+		pos.Add(NW),
 	}
 }

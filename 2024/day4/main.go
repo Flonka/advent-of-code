@@ -9,10 +9,8 @@ import (
 )
 
 func main() {
-
 	d := initDay("XMAS")
 	d.part1()
-
 }
 
 type Day4 struct {
@@ -21,7 +19,6 @@ type Day4 struct {
 }
 
 func (d *Day4) part1() {
-
 	// For each string pos, if its X; search for XMAS in all directions
 	p := spatial.DiscretePos2D{}
 	count := 0
@@ -33,19 +30,11 @@ func (d *Day4) part1() {
 			s := d.data.GetValue(0, p)
 			if s == string(d.searchWord[0]) {
 				// start search in all directions
-
 			}
 		}
 	}
 
 	fmt.Println("Part1:", count)
-}
-
-func (d *Day4) floodSearch(p spatial.DiscretePos2D) int {
-
-	pn := spatial.DiscretePos2D{X: p.X, Y: p.Y}
-	// Right
-
 }
 
 func initDay(targetWord string) Day4 {
@@ -61,7 +50,6 @@ func initDay(targetWord string) Day4 {
 
 			var val string
 			if strings.ContainsRune(targetWord, r) {
-
 				val = string(r)
 			} else {
 				val = "."
