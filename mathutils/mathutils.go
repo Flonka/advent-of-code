@@ -1,7 +1,8 @@
+// Package mathutils contain some math related algorithms or functions
 package mathutils
 
+// GCD greatest common divisor via Euclidean algorithm
 // Stolen from : https://siongui.github.io/2017/06/03/go-find-lcm-by-gcd/
-// greatest common divisor (GCD) via Euclidean algorithm
 func GCD(a, b int) int {
 	for b != 0 {
 		t := b
@@ -11,7 +12,7 @@ func GCD(a, b int) int {
 	return a
 }
 
-// find Least Common Multiple (LCM) via GCD
+// LCM find Least Common Multiple via GCD
 func LCM(a, b int, integers ...int) int {
 	result := a * b / GCD(a, b)
 
@@ -22,6 +23,7 @@ func LCM(a, b int, integers ...int) int {
 	return result
 }
 
+// AbsInt returns absolute number of an integer.
 func AbsInt(n int) int {
 	if n < 0 {
 		return -n
