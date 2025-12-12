@@ -33,7 +33,7 @@ func isRollLiftable(dmap *spatial.DiscreteMap2D[bool], pos spatial.DiscretePos2D
 		if dmap.IsPositionInbounds(p) {
 			if dmap.GetValue(0, p) {
 				rollNeihgbours++
-				if rollNeihgbours > 4 {
+				if rollNeihgbours >= 4 {
 					// roll can be lifted
 					return false
 				}

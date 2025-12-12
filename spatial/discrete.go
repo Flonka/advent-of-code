@@ -27,10 +27,10 @@ func (d *DiscreteMap2D[T]) GetDataIndex(pos DiscretePos2D) int {
 }
 
 func (d *DiscreteMap2D[T]) IsPositionInbounds(p DiscretePos2D) bool {
-	if p.X < 0 || p.X > d.Width {
+	if p.X < 0 || p.X >= d.Width {
 		return false
 	}
-	if p.Y < 0 || p.Y > d.Height {
+	if p.Y < 0 || p.Y >= d.Height {
 		return false
 	}
 	return true
@@ -47,7 +47,7 @@ var (
 	N  = DiscretePos2D{0, 1}
 	NE = DiscretePos2D{1, 1}
 	E  = DiscretePos2D{1, 0}
-	SE = DiscretePos2D{1, 1}
+	SE = DiscretePos2D{1, -1}
 	S  = DiscretePos2D{0, -1}
 	SW = DiscretePos2D{-1, -1}
 	W  = DiscretePos2D{-1, 0}
