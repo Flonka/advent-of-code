@@ -1,16 +1,18 @@
 package main
 
 import (
-	"fmt"
 	"log"
+	"log/slog"
 	"strconv"
 
+	"github.com/Flonka/advent-of-code/cli"
 	"github.com/Flonka/advent-of-code/input"
 )
 
 func main() {
+	cli.Default()
 	ranges, ids := readData()
-	fmt.Println(len(ranges), len(ids))
+	slog.Info("Read data lengths", "ranges", len(ranges), "ids", len(ids))
 }
 
 func readData() ([]input.Range, []int) {

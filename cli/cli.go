@@ -4,6 +4,9 @@ import (
 	"flag"
 	"log/slog"
 	"os"
+	"time"
+
+	"github.com/lmittmann/tint"
 )
 
 // Default sets up default CLI args and slog package configuration.
@@ -13,12 +16,16 @@ func Default() *slog.LevelVar {
 	flag.Parse()
 
 	logLevel := new(slog.LevelVar)
-	if debug == true {
+	if debug {
 		logLevel.Set(slog.LevelDebug)
 	}
 
-	h := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: logLevel})
-	slog.SetDefault(slog.New(h))
+	// Set global logger with custom options
+	slog.SetDefault(slog.New(
+		tint.NewHandler(os.Stderr, &tint.Options{
+			Level:      logLevel,
+			TimeFormat: time.StampMicro,
+		}),
+	))
 	return logLevel
-
 }
