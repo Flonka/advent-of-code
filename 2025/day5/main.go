@@ -13,6 +13,25 @@ func main() {
 	cli.Default()
 	ranges, ids := readData()
 	slog.Info("Read data lengths", "ranges", len(ranges), "ids", len(ids))
+
+	freshCount := 0
+
+	for _, id := range ids {
+		if isFresh(ranges, id) {
+			freshCount++
+		}
+	}
+
+	slog.Info("Problem 1", "freshCount", freshCount)
+}
+
+func isFresh(ranges []input.Range, id int) bool {
+	for _, r := range ranges {
+		if id >= r.Start && id <= r.End {
+			return true
+		}
+	}
+	return false
 }
 
 func readData() ([]input.Range, []int) {
