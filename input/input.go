@@ -1,3 +1,5 @@
+// Package input contains reusable functions and types for parsing the
+// advent calendar's different problem inputs.
 package input
 
 import (
