@@ -1,7 +1,10 @@
 // Package spatial contain types about accessing and storing spatial data.
 package spatial
 
-import "fmt"
+import (
+	"fmt"
+	"log/slog"
+)
 
 // DiscreteMap2D can be used for storing 2d data with multiple dimensions in
 // a integer coordinate system.
@@ -101,6 +104,7 @@ func NewDiscreteMap2DFromLines[T any](dimension int, lines []string, transformFu
 		}
 	}
 
+	slog.Debug("NewDiscreteMap2DFromLines", "map", dmap)
 	return dmap
 }
 
