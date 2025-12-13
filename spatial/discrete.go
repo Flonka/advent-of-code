@@ -8,6 +8,8 @@ import (
 
 // DiscreteMap2D can be used for storing 2d data with multiple dimensions in
 // a integer coordinate system.
+//
+// The origin is top left of the map.
 type DiscreteMap2D[T any] struct {
 	Width  int
 	Height int
