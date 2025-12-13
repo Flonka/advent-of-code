@@ -1,12 +1,18 @@
 // Package spatial contain types about accessing and storing spatial data.
 package spatial
 
+import "fmt"
+
 // DiscreteMap2D can be used for storing 2d data with multiple dimensions in
 // a integer coordinate system.
 type DiscreteMap2D[T any] struct {
 	Width  int
 	Height int
 	Data   [][]T
+}
+
+func (d DiscreteMap2D[T]) String() string {
+	return fmt.Sprintf("{Width=%v,Height=%v}", d.Width, d.Height)
 }
 
 // SetValue sets a value of a position in the dimension
@@ -80,7 +86,7 @@ func NewDiscreteMap2D[T any](width, height, dimension int) DiscreteMap2D[T] {
 // NewDiscreteMap2DFromLines creates DiscreteMap2D with width and height from the input lines
 // it is assumed all linesare the same length
 // first dimension is filled from lines in combination with the transformFunc data type.
-func NewDiscreteMap2DFromLines[T any](dimension int, lines []string, transformFunc func(r rune) T) DiscreteMap2D[T] {
+func NewDiscreteMap2DFromLines[T any](dimension int, lines []string, transformFunc func(r rune, pos DiscretePos2D) T) DiscreteMap2D[T] {
 	w := len(lines[0])
 	h := len(lines)
 
@@ -91,7 +97,7 @@ func NewDiscreteMap2DFromLines[T any](dimension int, lines []string, transformFu
 		p.Y = y
 		for x, r := range l {
 			p.X = x
-			dmap.SetValue(0, p, transformFunc(r))
+			dmap.SetValue(0, p, transformFunc(r, p))
 		}
 	}
 
