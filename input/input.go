@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"io"
 	"log"
+	"log/slog"
 	"os"
 	"strconv"
 )
@@ -33,7 +34,11 @@ func OpenFileBuffered(fileName string) *bufio.Scanner {
 
 func ReadLinesInFile(fileName string) []string {
 	f := OpenFile(fileName)
-	defer f.Close()
+	defer func() {
+		if err := f.Close(); err != nil {
+			slog.Error("error closing file", "error", err)
+		}
+	}()
 	s := bufio.NewScanner(f)
 	outputLines := make([]string, 0, 200)
 	for s.Scan() {
@@ -62,8 +67,11 @@ func splitComma(data []byte, atEOF bool) (advance int, token []byte, err error) 
 // ReadCommaSeparatedInts assumes the first line in a file has all the integers comma separated
 func ReadCommaSeparatedInts(filePath string) []int {
 	r := OpenFile(filePath)
-	defer r.Close()
-
+	defer func() {
+		if err := r.Close(); err != nil {
+			slog.Error("error closing file", "error", err)
+		}
+	}()
 	s := bufio.NewScanner(r)
 
 	s.Split(splitComma)
@@ -82,7 +90,11 @@ func ReadCommaSeparatedInts(filePath string) []int {
 
 func ReadCommaSeparated[T ~string](filePath string) []T {
 	r := OpenFile(filePath)
-	defer r.Close()
+	defer func() {
+		if err := r.Close(); err != nil {
+			slog.Error("error closing file", "error", err)
+		}
+	}()
 
 	s := bufio.NewScanner(r)
 
@@ -99,7 +111,7 @@ func ReadCommaSeparated[T ~string](filePath string) []T {
 func StringsToInts(s []string) []int {
 	ints := make([]int, len(s))
 
-	for i := 0; i < len(s); i++ {
+	for i := range len(s) {
 		n, err := strconv.Atoi(s[i])
 		if err != nil {
 			log.Fatal(err)
