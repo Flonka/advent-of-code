@@ -48,6 +48,17 @@ func ReadLinesInFile(fileName string) []string {
 	return outputLines
 }
 
+// HandleInputLines reads from input.txt ,
+// the parameter handling function is called once per line.
+// the handleFunc parameters are the number of lines, the current line index (zero indexed), and the line
+func HandleInputLines(handleFunc func(lineCount int, lineIndex int, line string)) {
+	lines := ReadLinesInFile("input.txt")
+	lineCount := len(lines)
+	for i, l := range lines {
+		handleFunc(lineCount, i, l)
+	}
+}
+
 // splitComma is a bufio.SplitFunc, for splitting values on comma signs.
 func splitComma(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	commaIndex := bytes.IndexByte(data, ',')
