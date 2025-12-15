@@ -10,6 +10,10 @@ import (
 	"github.com/Flonka/advent-of-code/spatial"
 )
 
+const SPLITTER int = 1
+
+const TACHYION int = 2
+
 func main() {
 	cli.Default()
 	dmap, start := createMap()
@@ -20,9 +24,11 @@ func main() {
 }
 
 // findSplits returns the split count
-func findSplits(dmap *spatial.DiscreteMap2D[bool], startPos spatial.DiscretePos2D) int {
+func findSplits(dmap *spatial.DiscreteMap2D[int], startPos spatial.DiscretePos2D) int {
 	pSet := dutil.NewSet[spatial.DiscretePos2D]()
+	processed := dutil.NewSet[spatial.DiscretePos2D]()
 	pSet.Add(startPos)
+	processed.Add(startPos)
 
 	count := 0
 
@@ -36,9 +42,27 @@ func findSplits(dmap *spatial.DiscreteMap2D[bool], startPos spatial.DiscretePos2
 		} else {
 			// splitter found, add new traces west and east
 			count++
-			slog.Debug("Adding new traces", "pos", splitPos)
-			pSet.Add(splitPos.Add(spatial.E))
-			pSet.Add(splitPos.Add(spatial.W))
+			p1 := splitPos.Add(spatial.E)
+			p2 := splitPos.Add(spatial.W)
+
+			// Dont add traces if already added
+			// Dont add traces if the position is marked/traced by tachyons already
+
+			v1 := dmap.GetValue(0, p1)
+			v2 := dmap.GetValue(0, p2)
+
+			if !processed.Contains(p1) && v1 != TACHYION {
+				slog.Debug("Adding new trace", "pos", p1)
+				pSet.Add(p1)
+			}
+			if !processed.Contains(p2) && v2 != TACHYION {
+				slog.Debug("Adding new trace", "pos", p2)
+				pSet.Add(p2)
+			}
+
+			processed.Add(p1)
+			processed.Add(p2)
+
 		}
 		slog.Debug("Removing", "pos", pos)
 		pSet.Remove(pos)
@@ -49,35 +73,46 @@ func findSplits(dmap *spatial.DiscreteMap2D[bool], startPos spatial.DiscretePos2
 
 // findSplitter traces North to find splitter
 // and return the splitter position, or error if not found
-func findSplitter(dmap *spatial.DiscreteMap2D[bool], p spatial.DiscretePos2D) (spatial.DiscretePos2D, error) {
+// it also updates the map with tachyion traces
+func findSplitter(dmap *spatial.DiscreteMap2D[int], p spatial.DiscretePos2D) (spatial.DiscretePos2D, error) {
 	// trace the beam South(North in our map), per start position in the set of positions.
 	// add to the set when a beam is split, and increment splitcounter
 
+	dmap.SetValue(0, p, TACHYION)
+
 	// Start adding to the start pos
 	p = p.Add(spatial.N)
-	for !dmap.GetValue(0, p) {
+	// Loop until split found
+	for {
+		v := dmap.GetValue(0, p)
+		switch v {
+		case SPLITTER:
+			return p, nil
+		case TACHYION:
+			return p, errors.New("ran into other trace")
+		}
+
+		dmap.SetValue(0, p, TACHYION)
 		p = p.Add(spatial.N)
 		if !dmap.IsPositionInbounds(p) {
 			return p, errors.New("no splitter found")
 		}
 	}
-	// Should be a splitter pos now
-	return p, nil
 }
 
-func createMap() (spatial.DiscreteMap2D[bool], spatial.DiscretePos2D) {
+func createMap() (spatial.DiscreteMap2D[int], spatial.DiscretePos2D) {
 	lines := input.ReadLinesInFile("input.txt")
 
 	var startPos spatial.DiscretePos2D
 
-	dmap := spatial.NewDiscreteMap2DFromLines(1, lines, func(r rune, pos spatial.DiscretePos2D) bool {
+	dmap := spatial.NewDiscreteMap2DFromLines(1, lines, func(r rune, pos spatial.DiscretePos2D) int {
 		if r == 'S' {
 			startPos = pos
 		}
 		if r == '^' {
-			return true
+			return SPLITTER
 		}
-		return false
+		return 0
 	})
 	return dmap, startPos
 }
