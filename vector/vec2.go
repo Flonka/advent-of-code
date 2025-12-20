@@ -1,7 +1,9 @@
+// Package vector provides vector (algebra) related functions and types.
 package vector
 
 import "math"
 
+// Vec2 of integer components.
 type Vec2 struct {
 	X int
 	Y int
@@ -17,8 +19,8 @@ func (v *Vec2) Subtract(v2 *Vec2) {
 	v.Y -= v2.Y
 }
 
-func (a *Vec2) Dot(b *Vec2) int {
-	r := a.X*b.X + a.Y*b.Y
+func (v *Vec2) Dot(b *Vec2) int {
+	r := v.X*b.X + v.Y*b.Y
 	return r
 }
 
