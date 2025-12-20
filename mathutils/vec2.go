@@ -1,5 +1,4 @@
-// Package vector provides vector (algebra) related functions and types.
-package vector
+package mathutils
 
 import "math"
 
